@@ -7,7 +7,7 @@ a software or a workflow during a development phase or in different computationa
 Chimbuko enables the comparison of different runs at high and low levels of metric granularity.
 Chimbuko provides this capability in both offline and online (in-situ) modes. Because capturing
 performance metrics can quickly escalate in volume and provenance can be highly verbose,
-Chimbuko includes a data reduction module. The framework is intended to be used first in offline
+Chimbuko plan to include a data reduction module. The framework is intended to be used first in offline
 mode so that a user can determine what metrics are of interest to their case, and then in online
 
 
