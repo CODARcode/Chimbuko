@@ -16,8 +16,11 @@ mode so that a user can determine what metrics are of interest to their case, an
 
 
 
-## Performance Feature Extraction
+Performance Feature Extraction
+==============================
 
-## Performance Visualization
+Performance Visualization
+=========================
 
-## Data Analysis
+Data Analysis
+=============
