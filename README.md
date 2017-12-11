@@ -1,5 +1,7 @@
 # Chimbuko-0.1-Release-Dec.-2017
-## Introduction
+
+Introduction
+=============
 The Chimbuko framework captures, analyzes and visualizes performance metrics for complex
 scientific workflows and relates these metrics to the context of their execution on extreme-scale
 machines. The purpose of Chimbuko is to enable empirical studies of performance analysis for
@@ -10,7 +12,7 @@ performance metrics can quickly escalate in volume and provenance can be highly 
 Chimbuko plan to include a data reduction module. The framework is intended to be used first in offline
 mode so that a user can determine what metrics are of interest to their case, and then in online mode.
 
-![Chimbuko Basic Layout] (figures/chimbukolayout.png)
+![Chimbuko Basic Layout](figures/chimbukolayout.png)
 
 
 
