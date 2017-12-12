@@ -1,4 +1,4 @@
 [submodule "Performance_Visualization"]
-	path = Performance_Visullization
+	path = PerformanceVisullization
 	url = https://github.com/CODARcode/PerformanceVisualization.git
 	branch = master
