@@ -97,9 +97,8 @@ TAU provides utilities for merging trace and profile files and convert them to j
 
 Heat Transfer Example
 =====================
-The heat transfer example has been prepared to demonstrate CODAR Savana capability in which users can compose and execute multiple applications in an orchestrated environment. The heat transfer example is publicly available in CoDAR's git repository: https://github.com/CODARcode/Example-Heat_Transfer, or as a tarball associated with the Savanna v0.5 release https://github.com/CODARcode/savanna/releases/tag/v0.5. 
+The heat transfer example has been prepared to demonstrate CODAR Savana capability in which users can compose and execute multiple applications in an orchestrated environment. The heat transfer example is publicly available in CoDAR's git repository: https://github.com/CODARcode/Example-Heat_Transfer, or as a tarball associated with the Savanna v0.5 release https://github.com/CODARcode/savanna/releases/tag/v0.5. A short tutorial for running Heat Tranfer example with Chimbuko is available at https://github.com/CODARcode/Chimbuko-feature-extraction.
 
-Chimbuko was tested using Heat Transfer Example using Cheetah and Savanna.
 
 
 
