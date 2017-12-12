@@ -16,7 +16,7 @@ mode so that a user can determine what metrics are of interest to their case, an
 
 What is Chimbuko-0.1?
 =====================
-The Chimbuko installation includes performance feature extraction, performance visualization, and data analysis. These packages are included in Chimbuko as submodules. The installation script will install the dependencies. The release also include examples that users can use for self-guided exploration of the interfaces.
+Chimbuko-0.1 rlease aims at offline mode. The installation includes performance feature extraction, performance visualization, and data analysis. These packages are included in Chimbuko as submodules. The installation script will install the dependencies. The release also include examples that users can use for self-guided exploration of the interfaces.
 
 Installation
 =============
