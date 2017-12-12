@@ -7,10 +7,10 @@ scientific workflows and relates these metrics to the context of their execution
 machines. The purpose of Chimbuko is to enable empirical studies of performance analysis for
 a software or a workflow during a development phase or in different computational environments.
 Chimbuko enables the comparison of different runs at high and low levels of metric granularity.
-Chimbuko provides this capability in both offline and online (in-situ) modes. Because capturing
+Chimbuko aims at providing this capability in both offline and online (in-situ) modes. Because capturing
 performance metrics can quickly escalate in volume and provenance can be highly verbose,
 Chimbuko plan to include a data reduction module. The framework is intended to be used first in offline
-mode so that a user can determine what metrics are of interest to their case, and then in online mode.
+mode so that a user can determine what metrics are of interest to their case, and then in online mode. The following figure shows the basic layout of the Chimbuko framework.
 
 ![Chimbuko Basic Layout](figures/chimbukolayout.png)
 
