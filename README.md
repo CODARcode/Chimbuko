@@ -26,7 +26,6 @@ The following  tools are needed for Chimbuko.
 
 ### TAU ####
 If you the application is using ADIOS, you need to build TAU with ADIOS.
-### Building TAU with ADIOS ###
 
 * Build ADIOS 1.12 as usual (source available at https://github.com/ornladios/ADIOS)
 
