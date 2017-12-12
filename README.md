@@ -24,6 +24,8 @@ Installation
 Performance Feature Extraction
 ==============================
 
+https://github.com/CODARcode/Chimbuko-feature-extraction
+
 Performance Visualization
 =========================
 
