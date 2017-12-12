@@ -33,12 +33,11 @@ Performance Feature Extraction
 
 The TAU framework is used for performance feature extraction. Currently, TAU can be used for one application. Scientifc workflow consists of more than one applications. These applications interact with each others. In order to analyize the performance behavior of a scientific workflow, TAU framework was modified based on the BNL visualization and data anlysis teams's need. This includes coalesing different TAU profile and tracing data, converting data to JASON format and extracting performance summary of each component in a workflow.
 
-Chimbuko feature_extraction2json.py is a python script that takes profile data for each component in a scientifc workflow and summarizes basic information at the workflow level and at the component level. The script is publicly available in CoDAR's git https://github.com/CODARcode/Chimbuko-feature-extraction. 
+Chimbuko feature_extraction2json.py is a python script that takes profile data for each component in a scientifc workflow and summarizes basic information at the workflow level and at the component level. The script is publically available in CoDAR's git https://github.com/CODARcode/Chimbuko-feature-extraction. 
 
 Performance Visualization
 =========================
-
-https://github.com/CODARcode/PerformanceVisualization
+This is a visualization framework for Chimbuko performance evaluation based on TAU instrumentation to collect traces and profiles for workflow executions. This framework provides the visualization of these input and user interactions to understand the overall performance. The source code of visualization part is publically available in CODAR's git https://github.com/CODARcode/PerformanceVisualization
 
 Data Analysis
 =============
