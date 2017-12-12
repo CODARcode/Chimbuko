@@ -23,7 +23,7 @@ The Chimbuko-0.1 release aims at offline mode. The installation includes perform
 Software Dependencies
 =====================
 1. TAU
-2- MongoDB
+2. MongoDB
 
 Installation
 =============
