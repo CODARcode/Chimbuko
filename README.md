@@ -19,7 +19,7 @@ For more information about the design and working philosophy of Chimbuko, please
 
 What is Chimbuko-0.1?
 =====================
-The Chimbuko-0.1 release aims at offline mode. The installation includes performance feature extraction package, performance visualization package, and data analysis package. These packages are included in Chimbuko as submodules. The installation script will install the dependencies. 
+The Chimbuko-0.1 release is for offline mode. The installation includes performance feature extraction package, performance visualization package, and data analysis package. These packages are included in the release as submodules. The installation script will install the dependencies for the main components. 
 
 Software Dependencies
 =====================
