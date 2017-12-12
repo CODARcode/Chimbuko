@@ -39,7 +39,55 @@ Data Analysis
 
 LAMMP Example
 =============
+## Description
+This document describes the flow of generating TAU-based profile and trace data for the LAMMPS workflow example. Cheetah is used to generate scripts for automatically harness of experiments. The obtained profile and trace data could be further analyzed and visualized by using the Chimbuko framework.
 
+## code ( in a zipped file )
+1. ADIOS: https://github.com/ornladios/ADIOS.git
+2. FLEXPATH: http ://www.cc.gatech.edu/systems/projects/EVPath/chaos_bootstrap.pl
+3. LAMMPS example: https://github.com/CODARcode/Example-LAMMPS
+4. Stage_write: https://github.com/CODARcode/Example-Heat_Transfer/tree/master/stage_write
+5. TAU: http://tau.uoregon.edu/tau.tgz
+6. PDT: http://tau.uoregon.edu/pdt.tar.gz
+7. Cheetah: https://github.com/CODARcode/cheetah
+
+## Installation
+LAMMPS
+1. cd EXAMPLE-LAMMPS/lammps/src
+2. make yes-kspace yes-manybody yes-molecule yes-user-adios_staging
+3. make mpi -j8 CC=tau_cxx.sh LINK=tau_cxx.sh
+4. Stage_write
+5. copy the folder of stage_write to EXAMPLE-LAMMPS
+6. cd EXAMPLE-LAMMPS/stae_write
+7. make the following changes in Makefile:
+8. CC=tau_cxx.sh
+9. FC=tau_f90.sh
+10. ADIOS_CLIB=$(shell tau_cc.sh -tau:showlibs) $(shell adios_config -l)
+11. make
+
+## Configuration ( dependencies etc. )
+1. FLEXPATH
+2. wget http ://www.cc.gatech.edu/systems/projects/EVPath/chaos_bootstrap.pl
+3. perl ./chaos_bootstrap.pl
+4. perl ./chaos_build.pl
+5. ADIOS
+6. ./configure --with-flexpath=DIR
+7. make
+8. make install
+9. TAU https://www.cs.uoregon.edu/research/tau/docs/newguide/bk02ch01.html#installing.tau
+10 Cheetah git clone https://github.com/CODARcode/cheetah.git
+
+## Running the tool
+On Titan: ./cheetah.py -e lammps_stage_voro.py -a /Example-LAMMPS/swift-all  -m titan -o /campaigns/lammps
+cd /campaigns/lammps
+./run-all.sh
+
+## Examples ( Validation/ Verification) using LAMMP/Heat Equations etc.
+Two folders will be generated for each run in /campaigns/lammps/small-scale/run-xxx for LAMMPS and stage_write, respectively. In each generated tau folder, there are 3 files for each process per workflow component. For example, if a workflow launches 128 LAMMPS processes processes, there are 128 edf, 128 trc and 128 profile files for LAMMPS.
+
+## Helpful tips to the users
+TAU environment can be changed in cheetah/etc
+TAU provides utilities for merging trace and profile files and convert them to json format
 
 Heat Transfer Example
 =====================
