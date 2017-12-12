@@ -2,7 +2,7 @@
 
 Introduction
 =============
-The Chimbuko framework captures, analyzes and visualizes performance metrics for complex
+The Chimbuko framework captures, analyzes and visualizes performance metrics (see design documents in the documents direc tory) in the for complex
 scientific workflows and relates these metrics to the context of their execution on extreme-scale
 machines. The purpose of Chimbuko is to enable empirical studies of performance analysis for
 a software or a workflow during a development phase or in different computational environments.
