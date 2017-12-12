@@ -41,6 +41,9 @@ If your application is using ADIOS, you need to build TAU with ADIOS.
 Installation
 =============
 
+Preprocessing Data
+==================
+
 Performance Feature Extraction
 ==============================
 
@@ -56,7 +59,7 @@ Data Analysis
 =============
 Shinjae's stuff
 
-LAMMP Example
+LAMMPS Example
 =============
 The LAMMPS workflow example avaiable at https://github.com/CODARcode/Example-LAMMPS. Cheetah is used to generate scripts for automatically harness of experiments. The obtained profile and trace data could be further analyzed and visualized by using the Chimbuko framework. 
 
