@@ -18,7 +18,7 @@ For more information about the design and working philosophy of Chimbuko, please
 
 What is Chimbuko-0.1?
 =====================
-The Chimbuko-0.1 release aims at offline mode. The installation includes performance feature extraction package, performance visualization package, and data analysis package. These packages are included in Chimbuko as submodules. The installation script will install the dependencies. The release also include examples that users can use for self-guided exploration of the Chimbuko interfaces.
+The Chimbuko-0.1 release aims at offline mode. The installation includes performance feature extraction package, performance visualization package, and data analysis package. These packages are included in Chimbuko as submodules. The installation script will install the dependencies. 
 
 Software Dependencies
 =====================
@@ -97,7 +97,9 @@ TAU provides utilities for merging trace and profile files and convert them to j
 
 Heat Transfer Example
 =====================
-The heat transfer example has been prepared to demonstrate CODAR Savana capability in which users can compose and execute multiple applications in an orchestrated environment. The heat transfer example is publicly available in CoDAR's git repository: https://github.com/CODARcode/Example-Heat_Transfer, or as a tarball associated with the Savanna v0.5 release https://github.com/CODARcode/savanna/releases/tag/v0.5.
+The heat transfer example has been prepared to demonstrate CODAR Savana capability in which users can compose and execute multiple applications in an orchestrated environment. The heat transfer example is publicly available in CoDAR's git repository: https://github.com/CODARcode/Example-Heat_Transfer, or as a tarball associated with the Savanna v0.5 release https://github.com/CODARcode/savanna/releases/tag/v0.5. 
+
+Chimbuko was tested using Heat Transfer Example using Cheetah and Savanna.
 
 
 
