@@ -22,8 +22,22 @@ The Chimbuko-0.1 release aims at offline mode. The installation includes perform
 
 Software Dependencies
 =====================
-1. TAU
-2. MongoDB
+The following  tools are needed for Chimbuko.
+
+### TAU ####
+If you the application is using ADIOS, you need to build TAU with ADIOS.
+### Building TAU with ADIOS ###
+
+1. Build ADIOS 1.12 as usual (source available at https://github.com/ornladios/ADIOS)
+
+2. Configure and build TAU 2.26.2 (or highier) as usual. Add the flag -adios=/path/to/adios/installation at the configure step (source available at http://tau.uoregon.edu/tau.tgz) if you want to capture the adios events through TAU.
+
+3. Add /path/to/tau/$arch/bin to your PATH/path environment variable (where “/path/to/tau” is your TAU installation location)
+
+4. Set the TAU_MAKEFILE to the Makefile that matches your TAU configuration, located in /path/to/tau/$arch/lib/Makefile.tau-*
+
+### MongoDB ###
+1. You need to install MongoDB (https://docs.mongodb.com/v3.4/installation) on your machine for the visualization component.
 
 Installation
 =============
