@@ -25,7 +25,7 @@ Software Dependencies
 ---------------------
 The following  tools are needed for Chimbuko.
 
-### TAU ####
+#### TAU #####
 If your application is using ADIOS, you need to build TAU with ADIOS.
 
 * Build ADIOS 1.12 as usual (source available at https://github.com/ornladios/ADIOS)
@@ -36,10 +36,10 @@ If your application is using ADIOS, you need to build TAU with ADIOS.
 
 * Set the TAU_MAKEFILE to the Makefile that matches your TAU configuration, located in /path/to/tau/$arch/lib/Makefile.tau-*
 
-### MongoDB ###
+#### MongoDB ####
 * You need to install MongoDB (https://docs.mongodb.com/v3.4/installation) on your machine for the visualization component.
 
-### Nodejs ###
+#### Nodejs ####
 * You need to install Node.js (https://github.com/nodejs/help/wiki/Installation ) for the visualization component.
 
 Installation
