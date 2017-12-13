@@ -58,7 +58,7 @@ Chimbuko's `feature_extraction2json.py` is a python script that takes profile da
 Performance Visualization
 -------------------------
 
-The visualization framework of Chimbuko is based on the TAU instrumentation which collects traces and profiles for workflow executions. This framework provides the visualization of these input which helps a user to understand the overall performance. The source code of visualization part is publically available in CODAR's git https://github.com/CODARcode/PerformanceVisualization
+The visualization framework of Chimbuko is based on the TAU instrumentation which collects traces and profiles for workflow executions. This framework provides the visualization of these input which helps a user to understand the overall performance. The source code of visualization part is publically available in CODAR's git https://github.com/CODARcode/PerformanceVisualization.
 
 Data Analysis
 -------------
