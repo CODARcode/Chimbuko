@@ -45,8 +45,8 @@ If your application is using ADIOS, you need to build TAU with ADIOS.
 Installation
 -------------
 
-Preprocessing Data
---------------------
+Preprocessing of TAU Data
+-------------------------
 
 Performance Feature Extraction
 ------------------------------
