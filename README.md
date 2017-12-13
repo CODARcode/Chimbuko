@@ -39,6 +39,9 @@ If your application is using ADIOS, you need to build TAU with ADIOS.
 ### MongoDB ###
 * You need to install MongoDB (https://docs.mongodb.com/v3.4/installation) on your machine for the visualization component.
 
+### Nodejs ###
+* You need to install Node.js (https://github.com/nodejs/help/wiki/Installation ) for the visualization component.
+
 Installation
 -------------
 
