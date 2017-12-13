@@ -45,7 +45,12 @@ If your application is using ADIOS, you need to build TAU with ADIOS.
 Installation
 -------------
 ### Getting Chimbuko ###
-git clone --recursive  
+git clone --recursive  https://github.com/CODARcode/Chimbuko-0.1-Release-Dec.-2017-.git
+
+### Installing Main Software Dependencies ###
+cd `./Chimbuko-0.1-Release-Dec.2017-.git`
+`./install_chimbuko.sh`
+
 
 Preprocessing of TAU Data
 -------------------------
