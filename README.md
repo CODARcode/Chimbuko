@@ -48,9 +48,8 @@ Installation
 git clone --recursive  https://github.com/CODARcode/Chimbuko-0.1-Release-Dec.-2017-.git
 
 ### Installing Main Software Dependencies ###
-cd `./Chimbuko-0.1-Release-Dec.2017-.git`
-`./install_chimbuko.sh`
-
+* cd `./Chimbuko-0.1-Release-Dec.2017-.git`
+* `./chimbuko_installer.sh`
 
 Preprocessing of TAU Data
 -------------------------
