@@ -1,4 +1,4 @@
-# Chimbuko-0.1-Release-Dec.-2017
+# Chimbuko
 
 Introduction
 -------------
@@ -15,11 +15,11 @@ The following figure shows the basic layout of the Chimbuko framework.
 
 ![Chimbuko Basic Layout](figures/chimbukolayout.png)
 
-For more information about the design and working philosophy of Chimbuko, please refer to the documents in the directory https://github.com/CODARcode/Chimbuko-0.1-Release-Dec.-2017-/tree/master/documents .
+For more information about the design and working philosophy of Chimbuko, please refer to the documents in the directory https://github.com/CODARcode/Chimbuko/tree/master/documents .
 
-What is Chimbuko-0.1?
+What does this release has?
 ---------------------
-The Chimbuko-0.1 release is for offline mode. The installation includes performance feature extraction package, performance visualization package, and data analysis package. These packages are included in the release as submodules. The installation script will install the dependencies for the main components. 
+The release is for offline mode. The installation includes performance feature extraction package, performance visualization package, and data analysis package. These packages are included in the release as submodules. The installation script will install the dependencies for the main components. 
 
 Software Dependencies
 ---------------------
@@ -45,10 +45,10 @@ If your application is using ADIOS, you need to build TAU with ADIOS.
 Installation
 -------------
 #### Getting Chimbuko ####
-git clone --recursive  https://github.com/CODARcode/Chimbuko-0.1-Release-Dec.-2017-.git
+git clone --recursive  https://github.com/CODARcode/Chimbuko.git
 
 #### Installing Main Software Dependencies ####
-* cd `./Chimbuko-0.1-Release-Dec.2017-`
+* cd `./Chimbuko`
 * `./chimbuko_installer.sh`
 
 Preprocessing of TAU Data
