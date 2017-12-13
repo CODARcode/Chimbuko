@@ -17,8 +17,7 @@ The following figure shows the basic layout of the Chimbuko framework.
 
 For more information about the design and working philosophy of Chimbuko, please refer to the documents in the directory https://github.com/CODARcode/Chimbuko/tree/master/documents .
 
-What does this release has?
----------------------
+
 The release is for offline mode. The installation includes performance feature extraction package, performance visualization package, and data analysis package. These packages are included in the release as submodules. The installation script will install the dependencies for the main components. 
 
 Software Dependencies
