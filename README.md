@@ -64,7 +64,7 @@ Shinjae's stuff
 LAMMPS Example
 ---------------
 The LAMMPS workflow example is avaiable at https://github.com/CODARcode/Example-LAMMPS.
-Cheetah is used to generate scripts for automatically harness of experiments. The obtained profile and trace data could be  analyzed and visualized using Chimbuko. In the documents directory, Example-LAMMPS.pdf gives detail on configuring and running LAMMPS using TAU on Titan.
+Cheetah is used to generate scripts for automatically harness of experiments. The obtained profile and trace data could be  analyzed and visualized using Chimbuko. Example-LAMMPS.pdf, in the documents directory, gives detail on configuring and running LAMMPS using TAU on Titan.
 
 
 Heat Transfer Example
