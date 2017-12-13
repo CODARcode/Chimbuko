@@ -44,6 +44,8 @@ If your application is using ADIOS, you need to build TAU with ADIOS.
 
 Installation
 -------------
+### Getting Chimbuko ###
+git clone --recursive  
 
 Preprocessing of TAU Data
 -------------------------
