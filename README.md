@@ -47,10 +47,21 @@ Installation
 git clone --recursive  https://github.com/CODARcode/Chimbuko.git
 
 #### Installing Main Software Dependencies ####
-* cd `./Chimbuko`
+```
+* `./Chimbuko`
 * `./chimbuko_installer.sh`
+```
+#### Installing Dependencies for Data Analysis ####
+All you have to do is executing 
+```
+'scripts/install-dependency.sh' and you need pip3 preinstalled:
+```
 
-
+To run tests:
+```
+make
+make test
+```
 
 Performance Feature Extraction
 ------------------------------
