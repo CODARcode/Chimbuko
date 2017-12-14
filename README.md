@@ -94,7 +94,7 @@ We compose both *LAMMPS* and *NWCHEM* applications as our use case. The source c
 
 Performance Data Analysis
 -------------
-The data analysis framework of Chimbuko is based on the TAU instrumentation which collects traces and profiles for workflow executions. The framework detects performance anomalies for scientific workflows and applications using learning algorithms. The source code is publically available in CODAR's git https://github.com/CODARcode/PerformanceVisualization.
+The data analysis framework of Chimbuko is based on the TAU instrumentation which collects traces and profiles for workflow executions. The framework detects performance anomalies for scientific workflows and applications using learning algorithms. The source code is publically available in CODAR's git https://github.com/CODARcode/PerformanceAnalysis.
 
 This library provides a Python API to process TAU performance profile and traces. At the moment it supports the following functionality:
 * Extract function call entry and exsit event filtering from TAU trace
