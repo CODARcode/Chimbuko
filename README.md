@@ -72,7 +72,25 @@ Chimbuko's `feature_extraction2json.py` is a python script that takes profile da
 Performance Visualization
 -------------------------
 
-The visualization framework of Chimbuko is based on the TAU instrumentation which collects traces and profiles for workflow executions. This framework provides the visualization of these input which helps a user to understand the overall performance. The source code of visualization part is publically available in CODAR's git https://github.com/CODARcode/PerformanceVisualization.
+The visualization framework of Chimbuko is based on the TAU instrumentation which collects traces and profiles for workflow executions. This framework provides the visualization of these input which helps a user to understand the overall performance. 
+
+We visualize five major types of performance information:
+* trace function call events in execution time
+* trace messages send/receive events among nodes/cores
+* file transfer events among nodes/cores
+* profile with different metrics
+* outlier visualization (test phase)
+
+We provide four levels of details for trace visualization:
+
+* overview level -- showing general event heatmap
+* trace call group level -- showing aggregated function call events based on call groups.
+* trace detail level -- showing real function execution in a selected range of time for selected node/core.
+* node detail level -- showing an alternative cascaded view of the selected trace function execution.
+
+Our current release is for offline workflow examples. However, the front end that contains majority of functionalities is independent and well prepared for online access. The back end storage MongoDB can be replaced when the online data acess API is ready.
+
+We compose both *LAMMPS* and *NWCHEM* applications as our use case. The source code of visualization part is publically available in CODAR's git https://github.com/CODARcode/PerformanceVisualization.
 
 Performance Data Analysis
 -------------
