@@ -29,7 +29,7 @@ If your application is using ADIOS, you need to build TAU with ADIOS.
 
 * Build ADIOS 1.12 as usual (source available at https://github.com/ornladios/ADIOS)
 
-* Configure and build TAU 2.26.2 (or highier) as usual. Add the flag -adios=/path/to/adios/installation at the configure step (source available at http://tau.uoregon.edu/tau.tgz) if you want to capture the adios events through TAU.
+* Configure and build TAU 2.26.2 (or highier) as usual. Add the flag -adios=/path/to/adios/installation at the configure step (source available at https://tau.uoregon.edu/tau.tgz) if you want to capture the adios events through TAU.
 
 * Add /path/to/tau/$arch/bin to your PATH/path environment variable (where “/path/to/tau” is your TAU installation location)
 
