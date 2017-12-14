@@ -69,12 +69,14 @@ The data analysis framework of Chimbuko is based on the TAU instrumentation whic
 Examples
 --------
 
-###LAMMPS Example###
+### LAMMPS Example ###
+
 The LAMMPS workflow example is avaiable at https://github.com/CODARcode/Example-LAMMPS.
 Cheetah is used to generate scripts for automatically harness of experiments. The obtained profile and trace data could be  analyzed and visualized using Chimbuko. Example-LAMMPS.pdf, in the documents directory, gives detail on configuring and running LAMMPS using TAU on Titan.
 
 
-###Heat Transfer Example###
+### Heat Transfer Example ###
+
 The heat transfer example has been prepared to demonstrate CODAR Savana capability in which users can compose and execute multiple applications in an orchestrated environment. The heat transfer example is publicly available in CoDAR's git repository: https://github.com/CODARcode/Example-Heat_Transfer, or as a tarball associated with the Savanna v0.5 release https://github.com/CODARcode/savanna/releases/tag/v0.5. A short tutorial for running the heat tranfer example with Chimbuko for feature extraction is available at https://github.com/CODARcode/Chimbuko-feature-extraction.
 
 
