@@ -50,9 +50,6 @@ git clone --recursive  https://github.com/CODARcode/Chimbuko.git
 * cd `./Chimbuko`
 * `./chimbuko_installer.sh`
 
-Preprocessing of TAU Data
--------------------------
-
 Performance Feature Extraction
 ------------------------------
 
@@ -67,7 +64,7 @@ The visualization framework of Chimbuko is based on the TAU instrumentation whic
 
 Data Analysis
 -------------
-Shinjae's stuff
+
 
 LAMMPS Example
 ---------------
