@@ -64,7 +64,7 @@ The visualization framework of Chimbuko is based on the TAU instrumentation whic
 
 Data Analysis
 -------------
-
+The data analysis framework of Chimbuko is based on the TAU instrumentation which collects traces and profiles for workflow executions. The framework detects performance anomalies for scientific workflows and applications using learning algorithms. The source code is publically available in CODAR's git https://github.com/CODARcode/PerformanceVisualization.
 
 LAMMPS Example
 ---------------
