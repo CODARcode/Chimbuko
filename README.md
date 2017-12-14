@@ -47,8 +47,8 @@ git clone --recursive  https://github.com/CODARcode/Chimbuko.git
 
 #### Installing Main Software Dependencies ####
 ```
-./Chimbuko
-./chimbuko_installer.sh
+$cd ./Chimbuko
+$./chimbuko_installer.sh
 ```
 #### Installing Dependencies for Data Analysis ####
 All you have to do is executing 
