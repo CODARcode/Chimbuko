@@ -50,6 +50,8 @@ git clone --recursive  https://github.com/CODARcode/Chimbuko.git
 * cd `./Chimbuko`
 * `./chimbuko_installer.sh`
 
+
+
 Performance Feature Extraction
 ------------------------------
 
@@ -62,12 +64,15 @@ Performance Visualization
 
 The visualization framework of Chimbuko is based on the TAU instrumentation which collects traces and profiles for workflow executions. This framework provides the visualization of these input which helps a user to understand the overall performance. The source code of visualization part is publically available in CODAR's git https://github.com/CODARcode/PerformanceVisualization.
 
-Data Analysis
+Performance Data Analysis
 -------------
 The data analysis framework of Chimbuko is based on the TAU instrumentation which collects traces and profiles for workflow executions. The framework detects performance anomalies for scientific workflows and applications using learning algorithms. The source code is publically available in CODAR's git https://github.com/CODARcode/PerformanceVisualization.
 
-Examples
---------
+This library provides a Python API to process TAU performance profile and traces. At the moment it supports the following functionality:
+* Extract function call entry and exsit event filtering from TAU trace
+* Generate call stack with the depth `k`, the duration of call, job_id, node_id, and thread_id
+* Detect anomaliesExamples
+
 
 ### LAMMPS Example ###
 
