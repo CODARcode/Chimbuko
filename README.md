@@ -36,9 +36,10 @@ If your application is using ADIOS, you need to build TAU with ADIOS.
 * Set the TAU_MAKEFILE to the Makefile that matches your TAU configuration, located in /path/to/tau/$arch/lib/Makefile.tau-*
 
 #### MongoDB ####
-* You need to install MongoDB (https://docs.mongodb.com/v3.4/installation) on your machine for the visualization component.
+* You need to install MongoDB (https://docs.mongodb.com/v3.4/installation) on your machine for the visualization offline data management.
 
-
+#### NodeJS ####
+* You need to install NodeJS (https://www.npmjs.com/package/anaconda/tutorial) on your machine for the visualization back end.
 
 Installation
 -------------
@@ -55,7 +56,6 @@ All you have to do is executing
 ```
 'scripts/install-dependency.sh' and you need pip3 preinstalled:
 ```
-
 To run tests:
 ```
 make
@@ -68,6 +68,15 @@ Performance Feature Aggregation
 The TAU framework is used for feature extraction. Currently, TAU can be used for one application. However, scientifc workflows consist of more than one applications. These applications interact with each others. In order to analyize the performance behavior of scientific workflows, TAU framework's scripts were modified based on the BNL visualization and data anlysis teams' needs and feedback. This includes coalesing different TAU profiling and tracing data, converting performance data to JASON format, and extracting performance summary for each component in a workflow.
 
 Chimbuko's `feature_extraction2json.py` is a python script that takes profile data for each component in a scientifc workflow and summarizes basic information at the workflow level and at the component level. The script is publically available in CODAR's git https://github.com/CODARcode/Chimbuko-feature-extraction. 
+
+Performance Data Analysis
+-------------------------
+The data analysis framework of Chimbuko is based on the TAU instrumentation which collects traces and profiles for workflow executions. The framework detects performance anomalies for scientific workflows and applications using learning algorithms. The source code is publically available in CODAR's git https://github.com/CODARcode/PerformanceAnalysis.
+
+This library provides a Python API to process TAU performance profile and traces. At the moment it supports the following functionality:
+* Extract function call entry and exsit event filtering from TAU trace
+* Generate call stack with the depth `k`, the duration of call, job_id, node_id, and thread_id
+* Detect anomalies 
 
 Performance Visualization
 -------------------------
@@ -91,15 +100,6 @@ We provide four levels of details for trace visualization:
 Our current release is for offline workflow examples. However, the front end that contains majority of functionalities is independent and well prepared for online access. The back end storage MongoDB can be replaced when the online data acess API is ready.
 
 We compose both *LAMMPS* and *NWCHEM* applications as our use case. The source code of visualization part is publically available in CODAR's git https://github.com/CODARcode/PerformanceVisualization.
-
-Performance Data Analysis
--------------------------
-The data analysis framework of Chimbuko is based on the TAU instrumentation which collects traces and profiles for workflow executions. The framework detects performance anomalies for scientific workflows and applications using learning algorithms. The source code is publically available in CODAR's git https://github.com/CODARcode/PerformanceAnalysis.
-
-This library provides a Python API to process TAU performance profile and traces. At the moment it supports the following functionality:
-* Extract function call entry and exsit event filtering from TAU trace
-* Generate call stack with the depth `k`, the duration of call, job_id, node_id, and thread_id
-* Detect anomalies 
 
 Examples
 ---------
@@ -158,3 +158,6 @@ df = n_gram.detect_anomaly(trace_fn_lst, jid_lst, out_fn_prefix="results", call_
 ```
 This will generate final aggreated anomaly detected DataFrame with classified anomaly labels. You have less freedom to test but it is for the convenience. 'n_neighbors' is the number of neighborhood to estimate density, 'n_func_call' is about how many function call n_gram to process (top k frequent function call n_gram will be processed), and n_anomalies is about how many anomalies want to see.
 
+### Performance Visualization Example ###
+
+We use a composition of LAMMPS and NWCHEM examples to illustrate the main functionalities of performance visualization. It includes overview, trace view, node view, profile view and anomaly view. We saved the snapshots of each routine (https://github.com/CODARcode/PerformanceVisualization/tree/master/snapshots). For a detailed explanation, please check here: https://github.com/CODARcode/PerformanceVisualization#interface-description
