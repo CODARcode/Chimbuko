@@ -62,7 +62,7 @@ make
 make test
 ```
 
-Performance Feature Extraction
+Performance Feature Aggregation
 ------------------------------
 
 The TAU framework is used for feature extraction. Currently, TAU can be used for one application. However, scientifc workflows consist of more than one applications. These applications interact with each others. In order to analyize the performance behavior of scientific workflows, TAU framework's scripts were modified based on the BNL visualization and data anlysis teams' needs and feedback. This includes coalesing different TAU profiling and tracing data, converting performance data to JASON format, and extracting performance summary for each component in a workflow.
