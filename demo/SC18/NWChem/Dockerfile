@@ -135,9 +135,9 @@ RUN . /etc/profile && pip3 install adios adios_mpi
 
 # Copy current directory contents into the container
 RUN mkdir -p /Chimbuko
-#COPY PerformanceAnalysis/ /Chimbuko
-#COPY Visualization/ /Chimbuko
-#WORKDIR /Chimbuko
+COPY PerformanceAnalysis/ /Chimbuko
+COPY Visualization/ /Chimbuko
+WORKDIR /Chimbuko
 
 # Build NWChem
 
