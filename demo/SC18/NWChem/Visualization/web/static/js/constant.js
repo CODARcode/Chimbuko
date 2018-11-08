@@ -2,7 +2,7 @@ var lammps_options = {
 	'graphSizeCoef':36,
 	'graphRepelCoef':-12,
     'valueCoef':1,
-    'dynamicRepelCoef':-12,
+    'dynamicRepelCoef':-2,
     'dynamic_lmargin':0,
 	'clusterk':20,
 	'clustereps':2000,

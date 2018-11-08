@@ -21,6 +21,9 @@ class Data {
         this.projectionMethod = 0;
         this.scatterLayout = [];
         this.stat = [];
+
+        this.func_names = []
+        this.prog_names = []
     }
 
     streaming(){
@@ -44,6 +47,12 @@ class Data {
                     "cluster_label": -1,
                     "tree": null
                 });
+                if(!(_json['prog'][i] in me.prog_names)) {
+                    me.prog_names.push(_json['prog'][i]);
+                }
+                if(!(_json['func'][i] in me.func_names)) {
+                    me.func_names.push(_json['func'][i]);
+                }
             });
             var time_window = 60000000;//1 min
             //pop data

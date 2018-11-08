@@ -57,6 +57,8 @@ class ScatterView extends View {
             }
             me.stream_update();
         });
+        
+        me.colorScale = d3.scaleOrdinal(d3.schemeCategory20c).domain(d3.range(0,19));
     }
 
     stream_update(){
@@ -156,9 +158,9 @@ class ScatterView extends View {
             xAxis = this.xAxis
             .call(d3.axisBottom(me.x).tickFormat(function(d){
                 if(me.data.scatterLayout[me.axis[0]] == 'entry' || me.data.scatterLayout[me.axis[0]] == 'exit'){
-                    return parseFloat(d/1000000).toFixed(2)+"s";
+                    return parseFloat(d/1000000).toFixed(1)+"s";
                 }else if(me.data.scatterLayout[me.axis[0]] == 'value'){
-                    return parseFloat(d/1000).toFixed(2)+"ms";
+                    return parseFloat(d/1000).toFixed(1)+"ms";
                 }else{
                     return d;
                 }
@@ -182,9 +184,9 @@ class ScatterView extends View {
             .call(d3.axisLeft(me.y)
                 .tickFormat(function(d){
                     if(me.data.scatterLayout[me.axis[1]] == 'entry' || me.data.scatterLayout[me.axis[1]] == 'exit'){
-                        return parseFloat(d/1000000).toFixed(2)+"s";
+                        return parseFloat(d/1000000).toFixed(1)+"s";
                     }else if(me.data.scatterLayout[me.axis[1]] == 'value'){
-                        return parseFloat(d/1000).toFixed(2)+"ms";
+                        return parseFloat(d/1000).toFixed(1)+"ms";
                     }else{
                         return d;
                     }
@@ -203,10 +205,8 @@ class ScatterView extends View {
         var me = this;
 
         // compute progname and funcname sets
-        var progname = [];
-        var funcname = [];
-        me.data.data.forEach(d => progname.push(d.prog_name));
-        me.data.data.forEach(d => funcname.push(d.func_name));
+        var progname = me.data.prog_names;
+        var funcname = me.data.func_names;
         var set_progname = Array.from(new Set(progname));
         var set_funcname = Array.from(new Set(funcname));
         //console.log(set_progname);
@@ -232,12 +232,12 @@ class ScatterView extends View {
                 }
             })
                 .append("circle")
-                .attr("r", d => d.anomaly_score<0?6:4)
+                .attr("r", d => d.anomaly_score<0?5:4)
                 .attr("cx", d => me.x(d.pos[me.axis[0]]))
                 .attr("cy", d => me.y(d.pos[me.axis[1]]))
                 .attr("fill", d => me._fillColor(d, set_progname, set_funcname))
                 .attr("fill-opacity", d => me._fillOpacity(d))
-                .attr("stroke", d => d.anomaly_score<0?"red":0);
+                .attr("stroke", d => d.anomaly_score<0?"black":0);
 
         me.dot.on("click", function(d, i) {
             console.log("clicked "+i+"th tree, id:"+d['id']);
@@ -253,10 +253,9 @@ class ScatterView extends View {
         // five group, each with four lightness
         // if more than five functions, color repeats 
         // if more than four progs, lightness repeats
-        var newcolor = d3.scaleOrdinal(d3.schemeCategory20c).domain(d3.range(0,19));
-        var _newcolor = newcolor(funcname.indexOf(d.func_name)%5*4+d.prog_name%4);
-        this.legend_items["prog#"+d.prog_name+"-"+d.func_name]['color'] =  _newcolor;
-        return _newcolor
+        var c = this.colorScale(funcname.indexOf(d.func_name)%5*4+d.prog_name%4);
+        this.legend_items["prog#"+d.prog_name+"-"+d.func_name]['color'] = c;
+        return c;
 
         //var h = 360/funcname.length;
         //var c = (100-30)/progname.length;

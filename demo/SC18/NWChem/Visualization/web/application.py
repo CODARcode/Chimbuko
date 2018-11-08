@@ -16,6 +16,7 @@ class Data(object):
         self.labels = [] # the passed labels of the lineid of functions
         self.forest_labels = [] # the learned label, for now I simulated
         self.prog = []; # the program names of the tree in scatter plot
+        self.tidx = [];
         self.func_names = []; # the function name of interest in scatter plot
         self.func_dict = [] # all the names of the functions
         self.foi = [] # function of interest
@@ -50,21 +51,18 @@ class Data(object):
 
     def set_FOI(self, functions):
         with self.lock:
-            self.foi = functions        
-            self.changed = True
+            self.foi = functions     
+            #self.changed = True
 
     def set_event_types(self, types):
         for i, e in enumerate(types):
             self.event_types[e] = i
 
     def set_labels(self, labels):
-        # for label in labels:# self.labels indicates all the anoamaly lines
-        #     if label in self.lineid2treeid:
-        #         self.labels[self.lineid2treeid[label]] = -1# -1= anomaly and 1 = normal
         with self.lock:
             self.labels = labels
-            print("received %d anomaly" % len(labels))
-            self.changed = True
+            #print("received %d anomaly" % len(labels))
+            #self.changed = True
 
     def add_events(self, events):
         # convert events to json events
@@ -98,8 +96,8 @@ class Data(object):
                     self.idx_holder[obj['comm ranks']] = 0 # initialize by ranks
                 self.events[obj['comm ranks']].append(obj)
                 prev = obj
-                if obj['lineid'] in self.labels:
-                    print(obj['lineid'], ": ", e)
+                #if obj['lineid'] in self.labels:
+                #    print(obj['lineid'], ": ", e)
                 
                 if obj['event types'] == self.event_types['ENTRY']:
                     fname = obj["name"]
@@ -117,9 +115,8 @@ class Data(object):
                         obj['anomaly_score'] = 1
                         s['normal'] = s['normal'] + 1
                     if s['normal']>0 or s['anomal']>0:
-                        s['percent'] = (s['anomal']/(s['normal']+s['anomal']))*100
-                
-            self.changed = True
+                        s['percent'] = (s['anomal']/(s['normal']+s['anomal']))*100 
+            #self.changed = True
 
     def remove_old_data(self):
         # clean executions every time_window
@@ -155,7 +152,6 @@ class Data(object):
             self.forest.clear()
             self.lineid2treeid.clear()
             self.msgs.clear()
-            self.forest.clear() 
             self.func_dict.clear()
             self.event_types.clear()
             self.stacks.clear()
@@ -263,6 +259,36 @@ class Data(object):
         # events = []
         del self.events[rankId][:]
 
+    def generate_tree(self, treeid):
+        this_tree = self.forest[treeid]
+        execution = self.executions[this_tree['eid']]
+        queue = [(execution,0)]
+        while len(queue)>0:
+            node,ptid = queue[0]
+            queue.pop(0)
+            for child_id in node['children']:
+                if not child_id in self.executions:
+                    print("child not in executions", node)
+                child_node = self.executions[child_id]
+                ctid = len(this_tree['nodes'])
+                if not "messages" in child_node:
+                    child_node['messages'] = []
+                this_tree['nodes'].append({ # children of the tree
+                        'name':child_node['name'],
+                        "id": ctid,
+                        "comm ranks": execution["comm ranks"],
+                        "prog_name": execution["prog names"],
+                        "threads": execution["threads"],
+                        "findex": child_node["findex"],
+                        "value": (child_node["exit"] - child_node["entry"]),
+                        "messages": child_node["messages"],
+                        "entry": child_node["entry"],
+                        "exit": execution["exit"],
+                    })
+                this_tree['edges'].append({'source': ptid,'target': ctid})
+                queue.append((child_node,ctid))
+        #print(json.dumps(this_tree))
+
     def _exections2forest(self):
         # get tree based on foi
         # self.forest = []
@@ -278,60 +304,31 @@ class Data(object):
                     self.lineid2treeid[execution["lineid"]] = len(self.forest)
                     if not "messages" in execution:
                         execution["messages"] = []
-                    this_tree = { 
-                            "id": len(self.forest),
-                            "prog_name": execution["prog names"],
-                            "node_index": execution["comm ranks"],
-                            "threads": execution["threads"],
-                            "graph_index": len(self.forest),
-                            "nodes": [{ # root of the tree
-                                    "name": execution['name'], # self.foi,
-                                    "id": 0,
-                                    "comm ranks": execution["comm ranks"],
-                                    "prog_name": execution["prog names"],
-                                    "threads": execution["threads"],
-                                    "findex": execution["findex"],
-                                    "value": (execution["exit"] - execution["entry"]),
-                                    "messages": execution["messages"],
-                                    "entry": execution["entry"],
-                                    "exit": execution["exit"],
-                                }],
-                            "edges": [],
-                            "anomaly_score": execution['anomaly_score'] #-1 if str(int(execution["lineid"])) in self.labels else 1
-                        }
-                    
-                    # if str(int(execution["lineid"])) in self.labels:
-                        # print('lineid matched')
                     if (execution["exit"]-execution["entry"]) < 0:
                         print('negative run time detected.')
-                        
-                    queue = [(execution,0)]
-                    while len(queue)>0:
-                        node,ptid = queue[0]
-                        queue.pop(0)
-                        for child_id in node['children']:
-                            if not child_id in self.executions:
-                                print("child not in executions", node)
-                            child_node = self.executions[child_id]
-                            ctid = len(this_tree['nodes'])
-                            if not "messages" in child_node:
-                                child_node['messages'] = []
-                            this_tree['nodes'].append({ # children of the tree
-                                    'name':child_node['name'],
-                                    "id": ctid,
-                                    "comm ranks": execution["comm ranks"],
-                                    "prog_name": execution["prog names"],
-                                    "threads": execution["threads"],
-                                    "findex": child_node["findex"],
-                                    "value": (child_node["exit"] - child_node["entry"]),
-                                    "messages": child_node["messages"],
-                                    "entry": child_node["entry"],
-                                    "exit": execution["exit"],
-                                })
-                            this_tree['edges'].append({'source': ptid,'target': ctid})
-                            queue.append((child_node,ctid))
-                    self.forest.append(this_tree)
-        print("generate {} trees".format(len(self.forest)))
+                    self.forest.append({
+                        "id": len(self.forest),
+                        "eid": fidx,
+                        "prog_name": execution["prog names"],
+                        "node_index": execution["comm ranks"],
+                        "threads": execution["threads"],
+                        "graph_index": len(self.forest),
+                        "nodes": [{ # root of the tree
+                                "name": execution['name'], # self.foi,
+                                "id": 0,
+                                "comm ranks": execution["comm ranks"],
+                                "prog_name": execution["prog names"],
+                                "threads": execution["threads"],
+                                "findex": execution["findex"],
+                                "value": (execution["exit"] - execution["entry"]),
+                                "messages": execution["messages"],
+                                "entry": execution["entry"],
+                                "exit": execution["exit"],
+                            }],
+                        "edges": [],
+                        "anomaly_score": execution['anomaly_score'] #-1 if str(int(execution["lineid"])) in self.labels else 1
+                    })
+        #print("generate {} trees".format(len(self.forest)))
 
     def generate_forest(self):
         with self.lock:
@@ -340,11 +337,6 @@ class Data(object):
             self._exections2forest()
 
             # the scatterplot positions of the forest
-            self.pos = []
-            self.prog = []
-            self.func_names = []
-            self.forest_labels = []
-            self.tidx = []
             for i, t in enumerate(self.forest[self.idx_holder["tidx"]:], start=self.idx_holder["tidx"]):
                 if t['anomaly_score'] == -1 or (i%(1000/(self.sampling_rate*1000))==0): 
                     self.idx_holder["tidx"] += 1
@@ -362,7 +354,17 @@ class Data(object):
                     self.pos.append([
                         ent, val, rnk_thd, ext
                     ])
-            self.changed = False
+            print("generate {} trees".format(len(self.forest)))
+            self.changed = True
+    
+    def reset_forest(self):
+        self.pos = []
+        self.prog = []
+        self.func_names = []
+        self.forest_labels = []
+        self.tidx = []
+        print("reset forest data")
+        self.changed = False
 
 data = Data()
 
@@ -375,7 +377,8 @@ def get_tree():
     if request.json['data'] == 'tree':
         tindex = request.json['value']
         print("select tree #{}".format(tindex))
-        #print(data.forest[tindex])
+        if len(data.forest[tindex]['nodes']) == 1: # first request
+            data.generate_tree(tindex)
         return jsonify(data.forest[tindex])
 
 @web_app.route('/events', methods=['POST'])
@@ -395,19 +398,24 @@ def receive_events():
         data.set_FOI(d['foi'])
         data.set_labels(d['labels'])
         data.add_events(d['events'])
+        data.generate_forest()
     elif request.json['type'] == 'reset':
         data.reset()
     return jsonify({'received': len(data.forest)})
-
+ 
 def _stream():
     while(not data.changed):
-        time.sleep(1)
-    data.generate_forest()
+        time.sleep(0.1)
+    #data.generate_forest()
     #send back forest data
-    yield """
-        retry: 10000\ndata:{"pos":%s, "layout":%s, "labels":%s, "prog":%s, "func":%s, "tidx":%s, "stat":%s}\n\n
-    """ % (json.dumps(data.pos), json.dumps(data.layout), json.dumps(data.forest_labels), json.dumps(data.prog), 
-    json.dumps(data.func_names), json.dumps(data.tidx), json.dumps(data.stat) )
+    if data.pos:
+        with data.lock: 
+            print("send {} data to front".format(len(data.pos)))
+            yield """
+                retry: 10000\ndata:{"pos":%s, "layout":%s, "labels":%s, "prog":%s, "func":%s, "tidx":%s, "stat":%s}\n\n
+            """ % (json.dumps(data.pos), json.dumps(data.layout), json.dumps(data.forest_labels), json.dumps(data.prog), 
+            json.dumps(data.func_names), json.dumps(data.tidx), json.dumps(data.stat) )
+            data.reset_forest()
 
 @web_app.route('/stream')
 def stream():
