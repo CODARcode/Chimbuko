@@ -55,7 +55,7 @@ class Visualizer():
                 print("\nNo communication data to visualize...\n")
             
             r = req.post(self.vizUrl, json={'type': 'info', 'value': {'events': dataList, 'foi': funOfInt, 'labels': outlId}})
-            time.sleep(3)
+            #time.sleep(3)
             #if r.status_code != 201:
             #    raise ApiError('Trace post error:'.format(r.status_code))
             
