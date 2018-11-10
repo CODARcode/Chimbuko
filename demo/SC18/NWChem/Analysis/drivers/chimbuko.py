@@ -27,14 +27,16 @@ stopLoop = int(config['Debug']['StopLoop'])
 # Initialize parser object, get function id function name map 
 prs = parser.Parser(sys.argv[1])
 funMap = prs.getFunMap()
-eventTypeDict = prs.getEventType()
-numEventTypes = len(eventTypeDict)
-eventTypeList = [None] * numEventTypes 
-assert(numEventTypes > 0), "No event types detected (Assertion)...\n"
-for i in range(0,numEventTypes):
-    eventTypeList[i] = eventTypeDict[i]
-
-print("eventType:", eventTypeList, "\n")
+eventTypeList = prs.getEventType()
+#MGY
+#eventTypeDict = prs.getEventType()
+#numEventTypes = len(eventTypeDict)
+#eventTypeList = [None] * numEventTypes 
+#assert(numEventTypes > 0), "No event types detected (Assertion)...\n"
+#for i in range(0,numEventTypes):
+#    eventTypeList[i] = eventTypeDict[i]
+#print("eventType:", eventTypeList, "\n")
+#MGY
 
 # Initialize event object
 evn = event.Event(funMap, eventTypeList, sys.argv[1])

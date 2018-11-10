@@ -4,8 +4,9 @@ Authors: Gyorgy Matyasfalvi (gmatyasfalvi@bnl.gov)
 Create: August, 2018
 """
 
-import adios as ad
+import adios_mpi as ad
 import configparser
+import pickle
 from collections import defaultdict
 
 class Parser():
@@ -21,22 +22,30 @@ class Parser():
       self.bpAttrib = None
       self.bpNumAttrib = None
       self.numFun = 0
-      self.funMap = defaultdict(int)
-      self.eventType = defaultdict(int)
+      self.funMap = None
+      self.eventType = None
       
       if self.fileType == "bp":
-          ad.read_init("BP", parameters="verbose=3") # initialize adios streaming mode
+          ad.read_init("BP", parameters="verbose=3;check_read_status=0") # initialize adios streaming mode
           if self.parseMode == "stream":
             self.stream = ad.file(self.inputFile, "BP", is_stream=True, timeout_sec=10.0)
             self.bpAttrib = self.stream.attr
             self.bpNumAttrib = self.stream.nattrs    
-            for iter in self.bpAttrib: # extract funciton names and ids
-                if iter.startswith('timer'):
-                    self.numFun = self.numFun + 1
-                    self.funMap[int(iter.split()[1])] = str(self.bpAttrib[iter].value.decode("utf-8")) # if iter is a string "timer 123" separate timer and 123 and assign 123 as integer key to function map and the function name which is stored in self.bpAttrib[iter].value as a value  
-                if iter.startswith('event_type'):
-                    self.eventType[int(iter.split()[1])] = str(self.bpAttrib[iter].value.decode("utf-8"))  
-                    
+            with open('funMap.pickle', 'rb') as handle:
+                self.funMap = pickle.load(handle)
+                handle.close()
+            with open('eventType.pickle', 'rb') as handle:
+                self.eventType = pickle.load(handle)
+                handle.close()
+            
+            #MGY
+            #for iter in self.bpAttrib: # extract funciton names and ids
+            #    if iter.startswith('timer'):
+            #        self.numFun = self.numFun + 1
+            #        self.funMap[int(iter.split()[1])] = str(self.bpAttrib[iter].value.decode("utf-8")) # if iter is a string "timer 123" separate timer and 123 and assign 123 as integer key to function map and the function name which is stored in self.bpAttrib[iter].value as a value  
+            #    if iter.startswith('event_type'):
+            #        self.eventType[int(iter.split()[1])] = str(self.bpAttrib[iter].value.decode("utf-8"))  
+            #MGY        
     
             print("\nAdios stream ready... \n\n")
             # Debug
@@ -51,6 +60,8 @@ class Parser():
                         
             
     def getStream(self):
+        self.bpAttrib = self.stream.attr
+        self.bpNumAttrib = self.stream.nattrs
         strm = self.stream
         self.status = self.stream.advance()
         return strm
