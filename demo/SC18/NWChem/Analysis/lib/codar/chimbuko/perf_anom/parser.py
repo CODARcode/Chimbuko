@@ -26,9 +26,9 @@ class Parser():
       self.eventType = None
       
       if self.fileType == "bp":
-          ad.read_init("BP", parameters="verbose=3;check_read_status=0") # initialize adios streaming mode
+          ad.read_init("DATASPACES", parameters="verbose=3;check_read_status=0") # initialize adios streaming mode
           if self.parseMode == "stream":
-            self.stream = ad.file(self.inputFile, "BP", is_stream=True, timeout_sec=10.0)
+            self.stream = ad.file(self.inputFile, "DATASPACES", is_stream=True, timeout_sec=-1.0)
             self.bpAttrib = self.stream.attr
             self.bpNumAttrib = self.stream.nattrs    
             with open('funMap.pickle', 'rb') as handle:
