@@ -24,7 +24,7 @@ class Parser():
       self.numFun = 0
       self.funMap = None
       self.eventType = None
-      
+     
       if self.fileType == "bp":
           ad.read_init("DATASPACES", parameters="verbose=3;check_read_status=0") # initialize adios streaming mode
           if self.parseMode == "stream":
