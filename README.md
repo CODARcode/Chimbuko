@@ -13,7 +13,7 @@ mode so that a user can determine what metrics are of interest to their case, an
 
 The following figure shows the basic layout of the Chimbuko framework.
 
-![Chimbuko Basic Layout](figures/architecture.png=24x48)
+![Chimbuko Basic Layout](figures/architecture.png)
 
 For more information about the design and working philosophy of Chimbuko, please refer to the documents in the directory https://github.com/CODARcode/Chimbuko/tree/master/documents . The ADIOS framework (https://www.olcf.ornl.gov/center-projects/adios/) orchestrates workflow (blue line) and provides data streaming. The TAU tool (https://www.cs.uoregon.edu/research/tau/home.php) provides performance metrics for instrumented components 1 and 2. It 
 
