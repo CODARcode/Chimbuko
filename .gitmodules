@@ -4,3 +4,6 @@
 [submodule "PerformanceVisualization"]
 	path = PerformanceVisualization
 	url = https://github.com/CODARcode/PerformanceVisualization.git
+[submodule "ChimbukoVisualization"]
+	path = ChimbukoVisualization
+	url = https://github.com/CODARcode/ChimbukoVisualization
