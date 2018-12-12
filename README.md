@@ -11,11 +11,17 @@ performance metrics can quickly escalate in volume and provenance can be highly 
 Chimbuko plans to include a data reduction module. The framework is intended to be used first in offline
 mode so that a user can determine what metrics are of interest to their case, and then in online mode. 
 
-The following figure shows the basic layout of the Chimbuko framework.
+The following figure shows the basic layout of the Chimbuko framework. 
+* The ADIOS framework (https://www.olcf.ornl.gov/center-projects/adios/) orchestrates workflow (blue line) and provides data streaming. 
+* The TAU tool (https://www.cs.uoregon.edu/research/tau/home.php) provides performance metrics for instrumented components 1 and 2. The tool extracts provenance metadata and trace data (green lines). 
+* SOSFlow stores and aggregates the data at each node. 
+* Trace data is dynamically analyzed to detect anomalies (solid red lines)
+* Selected metadata and trace data is stored ( e.g. time window for which trace event interesting) (dashed red lines)
+
 
 ![Chimbuko Basic Layout](figures/architecture.png)
 
-For more information about the design and working philosophy of Chimbuko, please refer to the documents in the directory https://github.com/CODARcode/Chimbuko/tree/master/documents . The ADIOS framework (https://www.olcf.ornl.gov/center-projects/adios/) orchestrates workflow (blue line) and provides data streaming. The TAU tool (https://www.cs.uoregon.edu/research/tau/home.php) provides performance metrics for instrumented components 1 and 2. It 
+For more information about the design and working philosophy of Chimbuko, please refer to the documents in the directory https://github.com/CODARcode/Chimbuko/tree/master/documents . 
 
 
 The release Chimbuko-v1.0 is for offline mode. The installation includes performance feature extraction package, performance visualization package, and data analysis package. These packages are included in the release as submodules. The installation script will install the dependencies for the main components. 
