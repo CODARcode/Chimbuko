@@ -13,7 +13,7 @@ mode so that a user can determine what metrics are of interest to their case, an
 
 The following figure shows the basic layout of the Chimbuko framework.
 
-![Chimbuko Basic Layout](figures/architecture.png)
+![Chimbuko Basic Layout](figures/architecture.png|30)
 
 For more information about the design and working philosophy of Chimbuko, please refer to the documents in the directory https://github.com/CODARcode/Chimbuko/tree/master/documents .
 
