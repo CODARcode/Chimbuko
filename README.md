@@ -36,7 +36,7 @@ The installation includes performance feature extraction package, performance vi
 NWCHEM Usecase
 ---------------
 
-[Chinmuko Data Analysis](https://github.com/CODARcode/PerformanceAnalysis)
+[Chimbuko Data Analysis](https://github.com/CODARcode/PerformanceAnalysis)
 -------------------------
 
 This library provides a Python API to process [TAU](http://tau.uoregon.edu) performance profile and traces. Its modules support the following functionalities:
