@@ -39,6 +39,8 @@ NWCHEM Usecase
 
 Chinmuko Data Analysis
 -------------------------
+[![Build Status](https://travis-ci.org/CODARcode/PerformanceAnalysis.svg?branch=master)](https://travis-ci.org/CODARcode/PerformanceAnalysis) 
+
 This library provides a Python API to process [TAU](http://tau.uoregon.edu) performance profile and traces. Its modules support the following functionalities:
 
   - Parser: processes a given TAU trace (both streaming and batch through Adios).
@@ -48,5 +50,7 @@ This library provides a Python API to process [TAU](http://tau.uoregon.edu) perf
 
 Chimbuko Visualization
 -------------------------
+
+
 This is a visualization framework for online performance analysis. This framework mainly focuses on visualizing real-time anomalous behaviors in a High Performance Computing application so that any patterns of anomalies that users might not have recognized can be effectively detected through online visual analytics.
 
