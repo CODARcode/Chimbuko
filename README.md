@@ -48,4 +48,5 @@ This library provides a Python API to process [TAU](http://tau.uoregon.edu) perf
 
 Chimbuko Visualization
 -------------------------
+This is a visualization framework for online performance analysis. This framework mainly focuses on visualizing real-time anomalous behaviors in a High Performance Computing application so that any patterns of anomalies that users might not have recognized can be effectively detected through online visual analytics.
 
