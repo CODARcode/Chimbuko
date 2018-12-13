@@ -37,9 +37,8 @@ SC18 Demo
 NWCHEM Usecase
 ---------------
 
-Chinmuko Data Analysis
+[Chinmuko Data Analysis](https://github.com/CODARcode/PerformanceAnalysis)
 -------------------------
-[![Build Status](https://travis-ci.org/CODARcode/PerformanceAnalysis.svg?branch=master)](https://travis-ci.org/CODARcode/PerformanceAnalysis) 
 
 This library provides a Python API to process [TAU](http://tau.uoregon.edu) performance profile and traces. Its modules support the following functionalities:
 
