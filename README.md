@@ -29,10 +29,9 @@ The release Chimbuko-v1.0 is for offline mode. Please see the [version_1 directo
 
 The installation includes performance feature extraction package, performance visualization package, and data analysis package. These packages are included in the release as submodules. The installation script will install the dependencies for the main components. 
 
-SC18 Demo
-----------
 
 [SC18 Demo](https://drive.google.com/file/d/1b9iSGWv5xWBA060BjGF5Dom3WZxdShJS/view)
+-----------
 
 NWCHEM Usecase
 ---------------
@@ -47,9 +46,8 @@ This library provides a Python API to process [TAU](http://tau.uoregon.edu) perf
   - Outlier: detects outliers in performance of functions.
   - Visualizer: provides an interface to Chimbuko's visualization [software](https://github.com/CODARcode/ChimbukoVisualization) (both online and offline through requests API).
 
-Chimbuko Visualization
+[Chimbuko Visualization](https://github.com/CODARcode/ChimbukoVisualization)
 -------------------------
-
 
 This is a visualization framework for online performance analysis. This framework mainly focuses on visualizing real-time anomalous behaviors in a High Performance Computing application so that any patterns of anomalies that users might not have recognized can be effectively detected through online visual analytics.
 
