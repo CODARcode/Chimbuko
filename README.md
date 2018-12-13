@@ -37,10 +37,15 @@ SC18 Demo
 NWCHEM Usecase
 ---------------
 
-Performance Data Analysis
+Chinmuko Data Analysis
 -------------------------
+This library provides a Python API to process [TAU](http://tau.uoregon.edu) performance profile and traces. Its modules support the following functionalities:
 
+  - Parser: processes a given TAU trace (both streaming and batch through Adios).
+  - Event: keeps track of event information such as function call stack and function execution times.
+  - Outlier: detects outliers in performance of functions.
+  - Visualizer: provides an interface to Chimbuko's visualization [software](https://github.com/CODARcode/ChimbukoVisualization) (both online and offline through requests API).
 
-Performance Visualization
+Chimbuko Visualization
 -------------------------
 
