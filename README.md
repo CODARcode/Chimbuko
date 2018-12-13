@@ -35,6 +35,11 @@ The installation includes performance feature extraction package, performance vi
 
 NWCHEM Usecase
 ---------------
+The detail about the implementation can be found on the following links:
+* https://github.com/hjjvandam/nwchem-1/tree/pretauadio/contrib/codar_integration
+* https://github.com/hjjvandam/nwchem-1/tree/pretauadio2
+
+
 
 [Chimbuko Data Analysis](https://github.com/CODARcode/PerformanceAnalysis)
 -------------------------
