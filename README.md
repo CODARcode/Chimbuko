@@ -27,7 +27,7 @@ For more information about the design and working philosophy of Chimbuko, please
 
 The release Chimbuko-v1.0 is for offline mode. Please see the [version_1 directory](https://github.com/CODARcode/Chimbuko/tree/master/version_1) for more information.
 
-The installation includes performance feature extraction package, performance visualization package, and data analysis package. These packages are included in the release as submodules. The installation script will install the dependencies for the main components. 
+
 
 
 [SC18 Demo](https://drive.google.com/file/d/1b9iSGWv5xWBA060BjGF5Dom3WZxdShJS/view)
