@@ -2,11 +2,11 @@
 
 Introduction
 -------------
-The Chimbuko framework captures, analyzes and visualizes performance metrics (see design documents in the documents directory) in the for complex scientific workflows and relates these metrics to the context of their execution on extreme-scale
+The Chimbuko framework captures, analyzes and visualizes performance metrics for complex scientific workflows and relates these metrics to the context of their execution on extreme-scale
 machines. The purpose of Chimbuko is to enable empirical studies of performance analysis for
 a software or a workflow during a development phase or in different computational environments.
 Chimbuko enables the comparison of different runs at high and low levels of metric granularity.
-Chimbuko aims at providing this capability in both offline and online (in-situ) modes. Because capturing
+Chimbuko provides this capability in both offline and online (in-situ) modes. Because capturing
 performance metrics can quickly escalate in volume and provenance can be highly verbose,
 Chimbuko plans to include a data reduction module. The framework is intended to be used first in offline
 mode so that a user can determine what metrics are of interest to their case, and then in online mode. 
@@ -17,7 +17,7 @@ The following figure shows the basic layout of the Chimbuko framework.
 
 * The [ADIOS framework ](https://www.olcf.ornl.gov/center-projects/adios/) orchestrates workflow (blue line) and provides data streaming. 
 * The [TAU tool](https://www.cs.uoregon.edu/research/tau/home.php) provides performance metrics for instrumented components 1 and 2. The tool extracts provenance metadata and trace data (green lines). 
-* SOSFlow stores and aggregates the data at each node. 
+* [SOSFlow ](https://github.com/cdwdirect/sos_flowstores) and aggregates the data at each node. 
 * Trace data is dynamically analyzed to detect anomalies (solid red lines)
 * Selected metadata and trace data is stored ( e.g. time window for which trace event interesting) (dashed red lines)
 
