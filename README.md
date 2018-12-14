@@ -41,7 +41,7 @@ The detail about the NWCHEM usecase can be found on the following links:
 
 
 
-[Chimbuko Data Analysis](https://github.com/CODARcode/PerformanceAnalysis)
+[Chimbuko Data Analysis](https://github.com/CODARcode/PerformanceAnalysis/tree/release)
 -------------------------
 
 This library provides a Python API to process [TAU](http://tau.uoregon.edu) performance profile and traces. Its modules support the following functionalities:
