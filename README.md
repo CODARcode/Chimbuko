@@ -27,7 +27,7 @@ For more information about the design and working philosophy of Chimbuko, please
 
 The release Chimbuko-v1.0 is for offline mode. Please see the [version_1 directory](https://github.com/CODARcode/Chimbuko/tree/master/version_1) for more information.
 
-
+The current release include support for online mode. For  software requirements and installation, check [Chimbuko Data Analysis](https://github.com/CODARcode/PerformanceAnalysis) and [Chimbuko Visualization](https://github.com/CODARcode/ChimbukoVisualization).
 
 
 [SC18 Demo](https://drive.google.com/file/d/1b9iSGWv5xWBA060BjGF5Dom3WZxdShJS/view)
