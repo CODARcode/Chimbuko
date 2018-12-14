@@ -7,3 +7,6 @@
 [submodule "ChimbukoVisualization"]
 	path = ChimbukoVisualization
 	url = https://github.com/CODARcode/ChimbukoVisualization
+[submodule "version_1/Chimbuko-feature-extraction"]
+	path = version_1/Chimbuko-feature-extraction
+	url = https://github.com/CODARcode/Chimbuko-feature-extraction.git
