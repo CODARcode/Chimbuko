@@ -35,7 +35,7 @@ The current release include support for online mode. For  software requirements 
 
 NWCHEM Usecase
 ---------------
-The detail about the implementation can be found on the following links:
+The detail about the NWCHEM usecase can be found on the following links:
 * https://github.com/hjjvandam/nwchem-1/tree/pretauadio/contrib/codar_integration
 * https://github.com/hjjvandam/nwchem-1/tree/pretauadio 
 
