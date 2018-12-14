@@ -10,3 +10,6 @@
 [submodule "version_1/Chimbuko-feature-extraction"]
 	path = version_1/Chimbuko-feature-extraction
 	url = https://github.com/CODARcode/Chimbuko-feature-extraction.git
+[submodule "version_1/PerformanceVisualization"]
+	path = version_1/PerformanceVisualization
+	url = https://github.com/CODARcode/PerformanceVisualization.git
