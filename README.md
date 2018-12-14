@@ -33,7 +33,7 @@ The current release include support for online mode. For  software requirements 
 [SC18 Demo](https://drive.google.com/file/d/1b9iSGWv5xWBA060BjGF5Dom3WZxdShJS/view)
 -----------
 
-NWCHEM Usecase
+NWCHEM Use case
 ---------------
 The detail about the NWCHEM usecase can be found on the following links:
 * https://github.com/hjjvandam/nwchem-1/tree/pretauadio/contrib/codar_integration
