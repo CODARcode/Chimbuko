@@ -13,3 +13,6 @@
 [submodule "version_1/PerformanceVisualization"]
 	path = version_1/PerformanceVisualization
 	url = https://github.com/CODARcode/PerformanceVisualization.git
+[submodule "PerformanceAnalysis"]
+	path = PerformanceAnalysis
+	url = https://github.com/CODARcode/PerformanceAnalysis.git
