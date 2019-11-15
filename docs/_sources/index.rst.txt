@@ -3,18 +3,28 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to Chimbuko's documentation!
-====================================
+Chimbuko: A Workflow-Level Scalable Performance Trace Analysis Tool
+===================================================================
+
+Funded by the `Exascale Computing Project (ECP) <https://www.exascaleproject.org/>`_, U.S. Department of Energy
 
 .. toctree::
-   :maxdepth: 2
-   :caption: Contents:
+   :caption: Inroduction:
 
+   introduction/overview
+   introduction/anomaly_detection
+   introduction/visualization
 
+.. toctree::
+   :caption: Installation:
 
-Indices and tables
-==================
+   installation/from_source
+   installation/docker
+   installation/singularity
 
-* :ref:`genindex`
-* :ref:`modindex`
+.. toctree::
+   :caption: Additional Information:
+
+   faq
+
 * :ref:`search`
