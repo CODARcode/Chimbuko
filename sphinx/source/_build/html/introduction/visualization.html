@@ -86,7 +86,15 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="overview.html">Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="anomaly_detection.html">Anomaly Detection (AD) module</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Visualization (Viz) module</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Visualization (Viz) module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#backend-server">Backend Server</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#frontend-visualization">Frontend visualization</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#in-situ-visualization">In-Situ Visualization</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#online-analysis-visualization">Online Analysis Visualization</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 <p class="caption"><span class="caption-text">Installation</span></p>
 <ul>
@@ -163,6 +171,93 @@
             
   <div class="section" id="visualization-viz-module">
 <h1>Visualization (Viz) module<a class="headerlink" href="#visualization-viz-module" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="backend-server">
+<h2>Backend Server<a class="headerlink" href="#backend-server" title="Permalink to this headline">¶</a></h2>
+<div class="figure align-default" id="id1">
+<img alt="Visualization server" src="../_images/vizserver.png" />
+<p class="caption"><span class="caption-text">The architecture for visualization backend server
+including uWSGI workers serving concurrent connections,
+celery workers and a Redis message queue for asynchronous tasks
+and a database for data storage.</span><a class="headerlink" href="#id1" title="Permalink to this image">¶</a></p>
+</div>
+<p>The backend server is designed to support</p>
+<ul class="simple">
+<li><p>Huge amounts of concurrent requests as many as the number of <em>on-node AD modules</em> currently running</p></li>
+<li><p>Streaming workflow-level performance analysis results (from PS) with minimal memory overhead</p></li>
+<li><p>Handling long running tasks asynchronously</p></li>
+</ul>
+<p>For this, the server is designed to have two levels of scaling. At the first level, uWSGI will
+instantiate the web application in its first process and will fork multiple times until the desired
+number of workers is reached. Each of them will be fully instantiated to be ready to serve
+connections. At the second level, especially to handle the long-running tasks (e.g. inserting/querying
+data into/from database) asynchronously, the requests are distributed over pre-forked processes
+(celery workers and Redis message queue) and return response as quickly as possible. Finally,
+streaming (or broadcasting) data to the connected users is done by using Websocket technology
+with socket IO library.</p>
+</div>
+<div class="section" id="frontend-visualization">
+<h2>Frontend visualization<a class="headerlink" href="#frontend-visualization" title="Permalink to this headline">¶</a></h2>
+<p>The frontend visualization design presents data in different levels of detail by following
+the <em>Overview first, zoom and filter, then details on-demand</em> mechanism commonly adopted
+in the visualization domain.</p>
+<div class="section" id="in-situ-visualization">
+<h3>In-Situ Visualization<a class="headerlink" href="#in-situ-visualization" title="Permalink to this headline">¶</a></h3>
+<div class="figure align-default" id="id2">
+<img alt="in-situ ranking dashboard" src="../_images/anomaly_stat_view.png" />
+<p class="caption"><span class="caption-text">Dynamic <strong>ranking dashboard</strong> as rank-level visualization granularity
+for the most and the least problematic MPI processes.</span><a class="headerlink" href="#id2" title="Permalink to this image">¶</a></p>
+</div>
+<p>Using the data from the Parameter Server (PS), the <em>in-situ</em> visualization receives data
+in a streaming fashion and processes that into a number of anomaly statistics. We aim to provide
+a dynamic <strong>ranking dashboard</strong> of the most and least problematic MPI ranks as a <em>rank-level</em>
+granularity of the application. The available statistics includes the average, standard deviation,
+maximum, minimum and the total number of anomaly functions. Users can select one of the statistic
+kinds along with the number ranks they want to see. Detailed information is available when
+hovering over each bar chart.</p>
+<div class="figure align-default" id="id3">
+<img alt="in-situ time frame-level granularity" src="../_images/anomaly_history.png" />
+<p class="caption"><span class="caption-text">Streaming view of several series of the numbers of anomalies as
+<em>time frame-level</em> visualization granularity for various ranks.</span><a class="headerlink" href="#id3" title="Permalink to this image">¶</a></p>
+</div>
+<p>Selecting (or clicking) bars in the <strong>ranking dashboard</strong> activates the visualization server
+to broadcast the number of anomalies to the connected users in a time frame while performance
+traced applications are running. This <strong>streaming scatter plot</strong> serves as a <em>time frame-level</em>
+granularity by showing the number of anomalies of a MPI rank within a time window.</p>
+<p>Here, each dot represents a time frame of a selected rank. Color encoding is applied to
+differentiate different ranks. Hovering over a dot will pop up a window showing detailed
+information including the number of detected anomalies, time frame id, and the analyzed time range.
+Clicking one dot triggers the online analysis visualization that is explained in the following
+subsection.</p>
+</div>
+<div class="section" id="online-analysis-visualization">
+<h3>Online Analysis Visualization<a class="headerlink" href="#online-analysis-visualization" title="Permalink to this headline">¶</a></h3>
+<p>The online analysis visualization is designed to retrieve data from database and to present
+the <em>finest level</em> of granularity into the function execution details.
+It consists of two parts: a <strong>function view</strong> and a <strong>call stack view</strong>.</p>
+<div class="figure align-default" id="id4">
+<img alt="online function view" src="../_images/anomaly_func_view.png" />
+<p class="caption"><span class="caption-text">The function execution visualization for a selected time frame (ID 149) and Rank ID 0
+for Application 0 in a “entry” vs. “fid” layout.</span><a class="headerlink" href="#id4" title="Permalink to this image">¶</a></p>
+</div>
+<p>In the <strong>function view</strong>, it visualizes distribution of executed functions within a selected time
+interval. The distribution can be controlled by selecting X- and Y-axis among function ID,
+entry and exit time, inclusive and exclusive run time, label indicating if anomaly or not,
+the number of children functions, and the number of communication (messages). Hovering a circle
+will show all available information. Clicking a circle (or a function) will trigger
+a call stack view that includes the selected function.</p>
+<div class="figure align-default" id="id5">
+<img alt="online function view" src="../_images/call_stack_view.png" />
+<p class="caption"><span class="caption-text">The call stack visualization for the selected function “MD_NEWTON”.</span><a class="headerlink" href="#id5" title="Permalink to this image">¶</a></p>
+</div>
+<p>In the <strong>call stack view</strong>, users can more closely investigate the relationships among functions
+and communications over ranks. For example, in the above figure, it shows zoomed-in
+call stack view within the time range refined by an user. Anomaly labels are encoded by the color
+of the name of each function with black being normal and red being abnormal. Hovering over
+a horizontal bar in the call stack will pop up detailed information regarding the corresponding
+function. A communication (message receiving or sending) is encoded by an arrow between a function
+and a horizontal line representing another rank ID.</p>
+</div>
+</div>
 </div>
 
 
@@ -219,6 +314,7 @@
       <script type="text/javascript" src="../_static/underscore.js"></script>
       <script type="text/javascript" src="../_static/doctools.js"></script>
       <script type="text/javascript" src="../_static/language_data.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
   
 
