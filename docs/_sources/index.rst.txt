@@ -9,21 +9,21 @@ Chimbuko: A Workflow-Level Scalable Performance Trace Analysis Tool
 Funded by the `Exascale Computing Project (ECP) <https://www.exascaleproject.org/>`_, U.S. Department of Energy
 
 .. toctree::
-   :caption: Inroduction:
+   :caption: Inroduction
 
    introduction/overview
    introduction/anomaly_detection
    introduction/visualization
 
 .. toctree::
-   :caption: Installation:
+   :caption: Installation
 
    installation/from_source
    installation/docker
    installation/singularity
 
 .. toctree::
-   :caption: Additional Information:
+   :caption: Additional Information
 
    faq
 

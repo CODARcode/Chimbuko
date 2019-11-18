@@ -82,19 +82,19 @@
               
             
             
-              <p class="caption"><span class="caption-text">Inroduction:</span></p>
+              <p class="caption"><span class="caption-text">Inroduction</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="anomaly_detection.html">Anomaly Detection (AD) module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="visualization.html">Visualization module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="visualization.html">Visualization (Viz) module</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Installation:</span></p>
+<p class="caption"><span class="caption-text">Installation</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../installation/from_source.html">From source</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../installation/docker.html">Docker</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../installation/singularity.html">Singularity</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Additional Information:</span></p>
+<p class="caption"><span class="caption-text">Additional Information</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../faq.html">FAQ</a></li>
 </ul>
@@ -163,6 +163,27 @@
             
   <div class="section" id="overview">
 <h1>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h1>
+<p>Due to the limits I/O systems currently impose on high-performance computing systems,
+a new generation of workflows that include online data reduction and analysis is emerging.
+To diagnose their performance requires sophisticated performance analysis capabilities,
+due to the complexity of execution patterns and underlying hardware.</p>
+<p>To date, no tool could handle the voluminous performance trace data needed to detect
+potential problems. This work introduces <strong>Chimbuko</strong>, a performance analysis framework
+that provides real-time, distributed, <em>in-situ</em> anomaly detection.</p>
+<div class="figure align-default" id="id1">
+<img alt="Chimbuko architecture diagram with major components" src="../_images/chimbuko_overview.png" />
+<p class="caption"><span class="caption-text">Chimbuko architecture diagram with major components: TAU, online AD modules, visualization,
+provenance database. It illustrates two concurrently running applications.</span><a class="headerlink" href="#id1" title="Permalink to this image">¶</a></p>
+</div>
+<p><strong>Chimbuko</strong> provides:</p>
+<ul class="simple">
+<li><p>Data volumes reduction for human-level processing without losing necessary details (See <a class="reference internal" href="anomaly_detection.html"><span class="doc">AD module</span></a>)</p></li>
+<li><p>Online performance monitoring (See <a class="reference internal" href="visualization.html"><span class="doc">Viz module</span></a>)</p></li>
+<li><p>The capture and reduction of performance provenance</p></li>
+</ul>
+<p>To the best of our knowledge, <strong>Chimbuko</strong> is the first online, distributed, and scalable
+workflow-level performance trace analysis framework, and we demonstrate the tool’s usefulness
+on ORNL’s Summit system.</p>
 </div>
 
 
