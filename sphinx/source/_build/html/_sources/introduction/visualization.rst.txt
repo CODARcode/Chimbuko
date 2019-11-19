@@ -40,6 +40,8 @@ In-Situ Visualization
 ~~~~~~~~~~~~~~~~~~~~~
 
 .. figure:: img/anomaly_stat_view.png
+   :scale: 50 %
+   :align: center
    :alt: in-situ ranking dashboard
 
    Dynamic **ranking dashboard** as rank-level visualization granularity 
@@ -54,6 +56,7 @@ kinds along with the number ranks they want to see. Detailed information is avai
 hovering over each bar chart. 
 
 .. figure:: img/anomaly_history.png
+   :align: center
    :alt: in-situ time frame-level granularity
 
    Streaming view of several series of the numbers of anomalies as 
@@ -79,6 +82,8 @@ the *finest level* of granularity into the function execution details.
 It consists of two parts: a **function view** and a **call stack view**. 
 
 .. figure:: img/anomaly_func_view.png
+   :scale: 60 %
+   :align: center
    :alt: online function view
 
    The function execution visualization for a selected time frame (ID 149) and Rank ID 0 
@@ -92,6 +97,7 @@ will show all available information. Clicking a circle (or a function) will trig
 a call stack view that includes the selected function.
 
 .. figure:: img/call_stack_view.png
+   :align: center
    :alt: online function view
 
    The call stack visualization for the selected function "MD_NEWTON".
