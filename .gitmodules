@@ -6,4 +6,3 @@
 	url = https://github.com/CODARcode/PerformanceVisualization.git
 [submodule "demo/SC18/NWChem/submod/Analysis"]
 	path = demo/SC18/NWChem/submod/Analysis
-	url = https://github.com/CODARcode/PerformanceAnalysis.git
