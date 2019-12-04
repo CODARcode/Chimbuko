@@ -2,6 +2,9 @@
 From source
 ***********
 
+For Ubuntu 16.04 system, we provide pre-built docker images users can quickly start
+with thier own TAU instrumented applications (See :doc:`docker`) .
+
 Install AD module
 -----------------
 
@@ -93,3 +96,23 @@ python virtual environment like Anaconda_.
 
 .. _Redis: https://redis.io/
 .. _Anaconda: https://www.anaconda.com/
+
+
+Run Chimbuko
+------------
+
+Ubuntu 16.04
+~~~~~~~~~~~~
+
+For Ubuntu users, we encourage to use our pre-built docker images (See :doc:`docker`).
+
+
+Summit
+~~~~~~
+
+TBD
+
+Cori
+~~~~
+
+TBD

@@ -6,6 +6,8 @@ Backend Server
 --------------
 
 .. figure:: img/vizserver.png
+   :scale: 20 %
+   :align: center
    :alt: Visualization server
 
    The architecture for visualization backend server 
@@ -40,7 +42,7 @@ In-Situ Visualization
 ~~~~~~~~~~~~~~~~~~~~~
 
 .. figure:: img/anomaly_stat_view.png
-   :scale: 50 %
+   :scale: 70 %
    :align: center
    :alt: in-situ ranking dashboard
 

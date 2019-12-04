@@ -1,7 +1,7 @@
 # Chimbuko
 
-Introduction
--------------
+## Introduction
+
 The Chimbuko framework captures, analyzes and visualizes performance metrics for complex scientific workflows and relates these metrics to the context of their execution on extreme-scale
 machines. The purpose of Chimbuko is to enable empirical studies of performance analysis for
 a software or a workflow during a development phase or in different computational environments.
@@ -13,46 +13,29 @@ mode so that a user can determine what metrics are of interest to their case, an
 
 The following figure shows the basic layout of the Chimbuko framework. 
 
-![Chimbuko Basic Layout](figures/Chimbuko-v2-arch.png)
+![Chimbuko Basic Layout](figures/chimbuko_overview.png)
 
-* The [ADIOS framework ](https://www.olcf.ornl.gov/center-projects/adios/) orchestrates workflow (blue line) and provides data streaming. 
-* The [TAU tool](https://www.cs.uoregon.edu/research/tau/home.php) provides performance metrics for instrumented components 1 and 2. The tool extracts provenance metadata and trace data (green lines). 
-* [SOSFlow ](https://github.com/cdwdirect/sos_flowstores) and aggregates the data at each node. 
-* Trace data is dynamically analyzed to detect anomalies (solid red lines)
-* Selected metadata and trace data is stored ( e.g. time window for which trace event interesting) (dashed red lines)
+* The [ADIOS framework ](https://www.olcf.ornl.gov/center-projects/adios/) orchestrates workflow and provides data streaming. 
+* The [TAU tool](https://www.cs.uoregon.edu/research/tau/home.php) provides performance metrics for instrumented components 1 and 2. The tool extracts provenance metadata and trace data. 
+* Trace data is dynamically analyzed to detect anomalies
+* Selected metadata and trace data is stored ( e.g. time window for which trace event interesting)
 
+For more information about the design and working philosophy of Chimbuko, please see the [documents directory](https://github.com/CODARcode/Chimbuko/tree/master/documents). 
 
-For more information about the design and working philosophy of Chimbuko, please see the [documents directory](https://github.com/CODARcode/Chimbuko/tree/master/documents) . 
+## Documentation
 
+Please find [details from here](https://codarcode.github.io/Chimbuko/).
 
-The release Chimbuko-v1.0 is for offline mode. Please see the [version_1 directory](https://github.com/CODARcode/Chimbuko/tree/master/version_1) for more information.
+## Releases
 
-The current release include support for online mode. For  software requirements and installation, check [Chimbuko Data Analysis](https://github.com/CODARcode/PerformanceAnalysis/tree/release) and [Chimbuko Visualization](https://github.com/CODARcode/ChimbukoVisualization).
-
-
-[SC18 Demo](https://drive.google.com/file/d/1b9iSGWv5xWBA060BjGF5Dom3WZxdShJS/view)
------------
-
-NWCHEM Use case
----------------
-The detail about the NWCHEM usecase can be found on the following links:
-* https://github.com/hjjvandam/nwchem-1/tree/pretauadio/contrib/codar_integration
-* https://github.com/hjjvandam/nwchem-1/tree/pretauadio 
+The current release include support for online mode. For  software requirements and installation, check [Chimbuko Data Analysis](https://github.com/CODARcode/PerformanceAnalysis) and [Chimbuko Visualization](https://github.com/CODARcode/ChimbukoVisualization).
 
 
+### [Chimbuko Data Analysis](https://github.com/CODARcode/PerformanceAnalysis)
 
-[Chimbuko Data Analysis](https://github.com/CODARcode/PerformanceAnalysis/tree/release)
--------------------------
+This library provides C/C++ APIs to process [TAU](http://tau.uoregon.edu) performance profile and traces.
 
-This library provides a Python API to process [TAU](http://tau.uoregon.edu) performance profile and traces. Its modules support the following functionalities:
-
-  - Parser: processes a given TAU trace (both streaming and batch through Adios).
-  - Event: keeps track of event information such as function call stack and function execution times.
-  - Outlier: detects outliers in performance of functions.
-  - Visualizer: provides an interface to Chimbuko's visualization [software](https://github.com/CODARcode/ChimbukoVisualization) (both online and offline through requests API).
-
-[Chimbuko Visualization](https://github.com/CODARcode/ChimbukoVisualization)
--------------------------
+### [Chimbuko Visualization](https://github.com/CODARcode/ChimbukoVisualization)
 
 This is a visualization framework for online performance analysis. This framework mainly focuses on visualizing real-time anomalous behaviors in a High Performance Computing application so that any patterns of anomalies that users might not have recognized can be effectively detected through online visual analytics.
 
