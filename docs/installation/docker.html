@@ -1,0 +1,427 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Docker &mdash; Chimbuko 3.0.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Singularity" href="singularity.html" />
+    <link rel="prev" title="From source" href="from_source.html" /> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> Chimbuko
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                3.0.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Inroduction</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../introduction/overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../introduction/anomaly_detection.html">Anomaly Detection (AD) module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../introduction/visualization.html">Visualization (Viz) module</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Installation</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="from_source.html">From source</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Docker</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#structure">Structure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#usages">Usages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#create-tau-instrumented-applications">Create TAU instrumented applications</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#create-chimbuko-enabled-applications">Create Chimbuko enabled applications</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#userful-docker-commands">Userful docker commands</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="singularity.html">Singularity</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Additional Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../faq.html">FAQ</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Chimbuko</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+      <li>Docker</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/installation/docker.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="docker">
+<h1>Docker<a class="headerlink" href="#docker" title="Permalink to this headline">¶</a></h1>
+<p>We provide pre-built docker images for easy usages.</p>
+<div class="section" id="structure">
+<h2>Structure<a class="headerlink" href="#structure" title="Permalink to this headline">¶</a></h2>
+<div class="figure align-center" id="id1">
+<img alt="Anomaly detection module architecture" src="../_images/docker_structure.png" />
+<p class="caption"><span class="caption-text">Structure of available docker images</span><a class="headerlink" href="#id1" title="Permalink to this image">¶</a></p>
+</div>
+<table class="colwidths-given docutils align-center" id="id2">
+<caption><span class="caption-text">Available docker images</span><a class="headerlink" href="#id2" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 30%" />
+<col style="width: 70%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Image name</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>base</p></td>
+<td><p>Ubuntu 16.04 with basic developement tools</p></td>
+</tr>
+<tr class="row-odd"><td><p>adios2</p></td>
+<td><p><a class="reference external" href="https://github.com/ornladios/ADIOS2">ADIOS2</a></p></td>
+</tr>
+<tr class="row-even"><td><p>tau2</p></td>
+<td><p><a class="reference external" href="https://github.com/UO-OACISS/tau2">TAU2</a></p></td>
+</tr>
+<tr class="row-odd"><td><p>viz</p></td>
+<td><p>Chimbuko visualization module</p></td>
+</tr>
+<tr class="row-even"><td><p>ad</p></td>
+<td><p>Chimbuko anomaly detection module</p></td>
+</tr>
+<tr class="row-odd"><td><p>nwchem</p></td>
+<td><p>TAU instrumented <a class="reference external" href="https://github.com/hjjvandam/nwchem-1/tree/pretauadio2">NWChem</a></p></td>
+</tr>
+<tr class="row-even"><td><p>heat2d</p></td>
+<td><p>TAU instrumented <a class="reference external" href="https://github.com/pnorbert/adiosvm/tree/master/Tutorial/heat2d/cpp">heat2d</a> simulation code</p></td>
+</tr>
+<tr class="row-odd"><td><p>brusselator</p></td>
+<td><p>TAU instrumented <a class="reference external" href="https://github.com/pnorbert/adiosvm/tree/master/Tutorial/brusselator/src">brusselator</a> simulation code</p></td>
+</tr>
+<tr class="row-even"><td><p>run_[app name]</p></td>
+<td><p>Chimbuko enabled application</p></td>
+</tr>
+</tbody>
+</table>
+<p>To download those available docker images,</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker pull chimbuko/<span class="o">[</span>Image name<span class="o">]</span>:latest
+</pre></div>
+</div>
+</div>
+<div class="section" id="usages">
+<h2>Usages<a class="headerlink" href="#usages" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="create-tau-instrumented-applications">
+<h3>Create TAU instrumented applications<a class="headerlink" href="#create-tau-instrumented-applications" title="Permalink to this headline">¶</a></h3>
+<p>The first step to use <strong>Chimbuko</strong> is to instrument TAU on target applications.
+For this, users can start from the pre-built TAU2 image. Here is an example to create
+an image of TAU instrumented heat2d simulation code.</p>
+<div class="highlight-docker notranslate"><div class="highlight"><pre><span></span><span class="k">FROM</span><span class="s"> chimbuko/tau2 AS heat2d-build</span>
+
+<span class="c"># set PATH environment variable (as the target applications required)</span>
+<span class="k">ENV</span> <span class="nv">PATH</span><span class="o">=</span><span class="si">${</span><span class="nv">PATH</span><span class="si">}</span>:/opt/tau2/x86_64/bin
+
+<span class="c"># set LD_LIBRARY_PATH variables (as the target applications required)</span>
+<span class="k">ENV</span> <span class="nv">LD_LIBRARY_PATH</span><span class="o">=</span><span class="si">${</span><span class="nv">LD_LIBRARY_PATH</span><span class="si">}</span>:/opt/libfabric/lib
+<span class="k">ENV</span> <span class="nv">LD_LIBRARY_PATH</span><span class="o">=</span><span class="si">${</span><span class="nv">LD_LIBRARY_PATH</span><span class="si">}</span>:/opt/blosc/lib
+<span class="k">ENV</span> <span class="nv">LD_LIBRARY_PATH</span><span class="o">=</span><span class="si">${</span><span class="nv">LD_LIBRARY_PATH</span><span class="si">}</span>:/opt/pdt/x86_64/lib
+<span class="k">ENV</span> <span class="nv">LD_LIBRARY_PATH</span><span class="o">=</span><span class="si">${</span><span class="nv">LD_LIBRARY_PATH</span><span class="si">}</span>:/opt/papi/lib
+<span class="k">ENV</span> <span class="nv">LD_LIBRARY_PATH</span><span class="o">=</span><span class="si">${</span><span class="nv">LD_LIBRARY_PATH</span><span class="si">}</span>:/opt/tau2/x86_64/lib
+<span class="k">ENV</span> <span class="nv">LD_LIBRARY_PATH</span><span class="o">=</span><span class="si">${</span><span class="nv">LD_LIBRARY_PATH</span><span class="si">}</span>:/opt/adios2/lib
+<span class="k">ENV</span> <span class="nv">LD_LIBRARY_PATH</span><span class="o">=</span><span class="si">${</span><span class="nv">LD_LIBRARY_PATH</span><span class="si">}</span>:/opt/SZ/lib
+
+<span class="c"># set TAU environment variable as needed</span>
+<span class="k">ENV</span> <span class="nv">TAU_MAKEFILE</span><span class="o">=</span>/opt/tau2/x86_64/lib/Makefile.tau-papi-mpi-pthread-pdt-adios2
+<span class="k">ENV</span> <span class="nv">TAU_OPTIONS</span><span class="o">=</span><span class="s2">&quot;-optShared -optRevert -optVerbose -optCompInst&quot;</span>
+
+<span class="c"># copy applications</span>
+<span class="k">COPY</span> /path/to/source /path/to/destination
+
+<span class="c"># compile/build the applications</span>
+<span class="k">WORKDIR</span><span class="s"> /path/to/destination</span>
+<span class="k">RUN</span> make heatSimulation
+
+<span class="c"># final image with ADIOS2 and TAU2</span>
+<span class="k">FROM</span><span class="s"> chimbuko/tau2</span>
+<span class="k">COPY</span> --from<span class="o">=</span>heat2d-build /path/to/destination /path/to/destination
+<span class="k">WORKDIR</span><span class="s"> /path/to/destination</span>
+</pre></div>
+</div>
+<p>To create a docker image,</p>
+<div class="highlight-docker notranslate"><div class="highlight"><pre><span></span>docker build -f /path/to/dockerfile -t <span class="o">[</span>image name:tag<span class="o">]</span> .
+</pre></div>
+</div>
+</div>
+<div class="section" id="create-chimbuko-enabled-applications">
+<h3>Create Chimbuko enabled applications<a class="headerlink" href="#create-chimbuko-enabled-applications" title="Permalink to this headline">¶</a></h3>
+<p>To create a <strong>Chimbuko</strong> enabled docker image for the target applications,
+users first need to create an executable bash script that runs the target applications
+along with <strong>Chimbuko</strong>. Users can find examples of the scripts from <a class="reference external" href="https://github.com/CODARcode/PerformanceAnalysis">here</a> or download
+<a class="reference download internal" download="" href="../_downloads/33496f27ea3b9d99c7d64ba0cc93df28/run_heat2d_chimbuko.sh"><code class="xref download docutils literal notranslate"><span class="pre">an</span> <span class="pre">example</span> <span class="pre">script</span> <span class="pre">for</span> <span class="pre">heat2d</span> <span class="pre">simulation</span> <span class="pre">code</span></code></a>.</p>
+<p>From the example script, users need to modify the application specific argument sections.
+Note that the first six arguments are reserved for the <strong>Chimbuko</strong>.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># chimbuko arguments</span>
+<span class="nv">ADIOS_MODE</span><span class="o">=</span><span class="si">${</span><span class="nv">1</span><span class="k">:-</span><span class="nv">SST</span><span class="si">}</span>
+<span class="nv">HAS_BPFILE</span><span class="o">=</span><span class="si">${</span><span class="nv">2</span><span class="k">:-</span><span class="nv">false</span><span class="si">}</span>
+<span class="nv">AD_SIGMA</span><span class="o">=</span><span class="si">${</span><span class="nv">3</span><span class="k">:-</span><span class="nv">6</span><span class="si">}</span>
+<span class="nv">AD_WINSZ</span><span class="o">=</span><span class="si">${</span><span class="nv">4</span><span class="k">:-</span><span class="nv">10</span><span class="si">}</span>
+<span class="nv">AD_INTERVAL</span><span class="o">=</span><span class="si">${</span><span class="nv">5</span><span class="k">:-</span><span class="nv">1000</span><span class="si">}</span>
+<span class="nv">BATCH_DIR</span><span class="o">=</span><span class="si">${</span><span class="nv">6</span><span class="k">:-</span><span class="p">/test</span><span class="si">}</span>
+
+<span class="c1"># application specific arguments</span>
+<span class="nv">NMPIS</span><span class="o">=</span><span class="si">${</span><span class="nv">7</span><span class="k">:-</span><span class="nv">12</span><span class="si">}</span>     <span class="c1"># [required] number of processes</span>
+<span class="nv">ARG1</span><span class="o">={</span><span class="nv">$8</span>:-arg1<span class="o">}</span>    <span class="c1"># application specific arguments</span>
+...
+<span class="nv">APP_ROOT</span><span class="o">=</span>/path/to/application
+<span class="nv">APP_BIN</span><span class="o">=</span>application binary name
+<span class="nv">APP_CMD</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">APP_ROOT</span><span class="si">}</span><span class="s2">/</span><span class="si">${</span><span class="nv">APP_BIN</span><span class="si">}</span><span class="s2"> </span><span class="nv">$ARG1</span><span class="s2">&quot;</span>
+
+...
+<span class="c1"># on application execution</span>
+mpirun -n <span class="nv">$NMPIS</span> <span class="nv">$APP_CMD</span>
+...
+</pre></div>
+</div>
+<p>Once the executable script is ready, users can easily build <strong>Chimbuko</strong> enabled application image
+using the pre-built Chimbuko docker images as the follows:</p>
+<div class="highlight-docker notranslate"><div class="highlight"><pre><span></span><span class="c"># get **Chimbuko** from pre-built images</span>
+<span class="k">FROM</span><span class="s"> chimbuko/ad AS ad-module</span>
+<span class="k">FROM</span><span class="s"> chimbuko/viz AS viz-module</span>
+
+<span class="c"># built from pre-built TAU instrumented application image</span>
+<span class="k">FROM</span><span class="s"> chimbuko/heat2d:latest</span>
+
+<span class="c"># copy chimbuko modules</span>
+<span class="k">RUN</span> mkdir -p /opt/chimbuko
+<span class="k">COPY</span> --from<span class="o">=</span>ad-module /opt/chimbuko /opt/chimbuko
+<span class="k">COPY</span> --from<span class="o">=</span>viz-module /opt/chimbuko /opt/chimbuko
+
+<span class="c"># set LD_LIBRARY_PATH as needed to run the applications</span>
+<span class="k">ENV</span> <span class="nv">LD_LIBRARY_PATH</span><span class="o">=</span><span class="si">${</span><span class="nv">LD_LIBRARY_PATH</span><span class="si">}</span>:/opt/libfabric/lib
+<span class="k">ENV</span> <span class="nv">LD_LIBRARY_PATH</span><span class="o">=</span><span class="si">${</span><span class="nv">LD_LIBRARY_PATH</span><span class="si">}</span>:/opt/blosc/lib
+<span class="k">ENV</span> <span class="nv">LD_LIBRARY_PATH</span><span class="o">=</span><span class="si">${</span><span class="nv">LD_LIBRARY_PATH</span><span class="si">}</span>:/opt/tau2/x86_64/lib
+<span class="k">ENV</span> <span class="nv">LD_LIBRARY_PATH</span><span class="o">=</span><span class="si">${</span><span class="nv">LD_LIBRARY_PATH</span><span class="si">}</span>:/opt/adios2/lib
+<span class="k">ENV</span> <span class="nv">LD_LIBRARY_PATH</span><span class="o">=</span><span class="si">${</span><span class="nv">LD_LIBRARY_PATH</span><span class="si">}</span>:/opt/SZ/lib
+
+<span class="c"># copy an executable script to run the target applications with **Chimbuko**</span>
+<span class="k">WORKDIR</span><span class="s"> /</span>
+<span class="k">COPY</span> run_heat2d_chimbuko.sh /
+
+<span class="c"># set entrypoint and default command line arguments</span>
+<span class="k">EXPOSE</span><span class="s"> 5000</span>
+<span class="k">ENTRYPOINT</span> <span class="p">[</span> <span class="s2">&quot;./run_script.sh&quot;</span> <span class="p">]</span>
+<span class="c"># The first six arguments are reserved for **Chimbuko**.</span>
+<span class="k">CMD</span> <span class="p">[</span> <span class="s2">&quot;SST&quot;</span><span class="p">,</span> <span class="s2">&quot;false&quot;</span><span class="p">,</span> <span class="s2">&quot;12&quot;</span><span class="p">,</span> <span class="s2">&quot;10&quot;</span><span class="p">,</span> <span class="s2">&quot;1000&quot;</span><span class="p">,</span> <span class="s2">&quot;/test&quot;</span><span class="p">,</span> <span class="s2">&quot;application arguments&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>After that, users can run the image,</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker run -p <span class="m">5000</span>:5000 -it <span class="o">[</span>image name<span class="o">]</span>:<span class="o">[</span>tag<span class="o">]</span> <span class="o">[</span>arguments to run<span class="o">]</span>
+</pre></div>
+</div>
+<p>and, to see the performance analysis results, open a browser at 127.0.0.1:5000.</p>
+</div>
+<div class="section" id="userful-docker-commands">
+<h3>Userful docker commands<a class="headerlink" href="#userful-docker-commands" title="Permalink to this headline">¶</a></h3>
+<p>To list available docker images:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker images
+</pre></div>
+</div>
+<p>To list running docker images:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker ps
+</pre></div>
+</div>
+<p>To stop a running docker image:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># find docker ID</span>
+docker ps
+<span class="c1"># stop an image</span>
+docker stop <span class="o">[</span>docker ID<span class="o">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="singularity.html" class="btn btn-neutral float-right" title="Singularity" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="from_source.html" class="btn btn-neutral" title="From source" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Brookhaven National Laboratory.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'3.0.0',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+      <script type="text/javascript" src="../_static/language_data.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

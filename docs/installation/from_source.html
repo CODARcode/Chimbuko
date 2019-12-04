@@ -1,0 +1,306 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>From source &mdash; Chimbuko 3.0.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Docker" href="docker.html" />
+    <link rel="prev" title="Visualization (Viz) module" href="../introduction/visualization.html" /> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> Chimbuko
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                3.0.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Inroduction</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../introduction/overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../introduction/anomaly_detection.html">Anomaly Detection (AD) module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../introduction/visualization.html">Visualization (Viz) module</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Installation</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">From source</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#install-ad-module">Install AD module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#ubuntu-16-04">Ubuntu 16.04</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#summit">Summit</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#cori">Cori</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#install-viz-module">Install Viz module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="docker.html">Docker</a></li>
+<li class="toctree-l1"><a class="reference internal" href="singularity.html">Singularity</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Additional Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../faq.html">FAQ</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Chimbuko</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+      <li>From source</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/installation/from_source.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="from-source">
+<h1>From source<a class="headerlink" href="#from-source" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="install-ad-module">
+<h2>Install AD module<a class="headerlink" href="#install-ad-module" title="Permalink to this headline">¶</a></h2>
+<p>First, download (or clone) <strong>Chimbuko</strong> AD module.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git clone https://github.com/CODARcode/PerformanceAnalysis.git
+</pre></div>
+</div>
+<div class="section" id="ubuntu-16-04">
+<h3>Ubuntu 16.04<a class="headerlink" href="#ubuntu-16-04" title="Permalink to this headline">¶</a></h3>
+<p>The AD module requires to have <a class="reference external" href="https://github.com/ornladios/ADIOS2">ADIOS2</a>, <a class="reference external" href="https://zeromq.org/">ZeroMQ</a>, and <a class="reference external" href="https://curl.haxx.se/">CURL</a>.
+To install <a class="reference external" href="https://github.com/ornladios/ADIOS2">ADIOS2</a> (MPI version), please check its website.
+For <a class="reference external" href="https://zeromq.org/">ZeroMQ</a> and <a class="reference external" href="https://curl.haxx.se/">CURL</a>,</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>apt-get install libzmq3-dev curl libcurl4-openssl-dev
+</pre></div>
+</div>
+<p>Optionally, to build test cases, users need to install gtest.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>apt-get install libgtest-dev
+<span class="nb">cd</span> /usr/src/gtest
+cmake CMakelists.txt
+make
+cp *.a /usr/lib
+</pre></div>
+</div>
+<p>Finally, to build the AD module</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span> /path/to/ad/module/dir
+make
+./run_test.sh  <span class="c1"># to run test cases</span>
+</pre></div>
+</div>
+<p>Note that users need to modify the <code class="code docutils literal notranslate"><span class="pre">Makefile</span></code> for the <a class="reference external" href="https://github.com/ornladios/ADIOS2">ADIOS2</a> path.</p>
+</div>
+<div class="section" id="summit">
+<h3>Summit<a class="headerlink" href="#summit" title="Permalink to this headline">¶</a></h3>
+<p>We provide <a class="reference download internal" download="" href="../_downloads/bf5777ad4c22879e6aaa62a6b534ef58/install_adios2.sh"><code class="xref download docutils literal notranslate"><span class="pre">an</span> <span class="pre">installation</span> <span class="pre">script</span></code></a> for <a class="reference external" href="https://github.com/ornladios/ADIOS2">ADIOS2</a>,
+if the latest version is not availale on Summit.</p>
+<p>To load required modules and build the AD module on Summit,</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span> /path/to/ad/module/dir
+<span class="nb">source</span> env.summit.sh
+make -f Makefile.summit
+</pre></div>
+</div>
+<p>Note that users need to modify <code class="code docutils literal notranslate"><span class="pre">Makefile.summit</span></code> for the <a class="reference external" href="https://github.com/ornladios/ADIOS2">ADIOS2</a> path.</p>
+</div>
+<div class="section" id="cori">
+<h3>Cori<a class="headerlink" href="#cori" title="Permalink to this headline">¶</a></h3>
+<p>TBD</p>
+</div>
+</div>
+<div class="section" id="install-viz-module">
+<h2>Install Viz module<a class="headerlink" href="#install-viz-module" title="Permalink to this headline">¶</a></h2>
+<p>First, download (or clone) <strong>Chimbuko</strong> visualization module that comes with
+backend server and the latest fronend bundled code. We encourage to use
+python virtual environment like <a class="reference external" href="https://www.anaconda.com/">Anaconda</a>.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git clone https://github.com/CODARcode/ChimbukoVisualizationII
+<span class="nb">cd</span> ChimbukoVisualizationII
+<span class="c1"># This will install Redis and run it.</span>
+webserver/run-redis.sh
+<span class="c1"># Kill Redis (Ctrl + X)</span>
+<span class="c1"># Then, install required python packages</span>
+pip install -r requirements.txt
+</pre></div>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="docker.html" class="btn btn-neutral float-right" title="Docker" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="../introduction/visualization.html" class="btn btn-neutral" title="Visualization (Viz) module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Brookhaven National Laboratory.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'3.0.0',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+      <script type="text/javascript" src="../_static/language_data.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

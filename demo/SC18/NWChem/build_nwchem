@@ -1,0 +1,2665 @@
+#!/bin/bash
+#export RELEASE=6.5
+function usage()
+{
+   cat <<EOF
+
+ Build NWChem
+ ============
+
+ This script compiles an executable of NWChem aiming to make this as automatic
+ as possible. While the script tries to guess as many configuration options 
+ possible one can always override this by setting appropriate environment 
+ variables (see section ENVIRONMENT VARIABLES). On most platforms it should
+ be enough to load modules for the compilers, and MPI libraries.
+
+
+ The script should be run in the top level NWChem directory (e.g. nwchem-6.1.1,
+ put differently the top level directory contains the directories src and
+ contrib) and takes at most one argument. This way you can use it to build
+ NWChem by simply invoking 
+
+    ./contrib/distro-tools/build_nwchem
+
+ and similarly clean everything up by invoking
+
+    ./contrib/distro-tools/build_nwchem realclean
+
+ running
+
+    ./contrib/distro-tools/build_nwchem help
+
+ produces this text.
+
+
+ For NWChem developers the script also generates the files
+
+    ./nwchem_make_env.csh
+    ./nwchem_make_env.sh
+
+ which provide environment variables used to compile the code. After sourcing 
+ one of these files the command
+
+    renwc
+
+ can be used to recompile only locally changed files in any source code
+ sub-directory. Of course if you want to change any compile time parameters you
+ will have to unset the corresponding environment variables before running
+ ./contrib/distro-tools/build_nwchem again.
+
+
+ Finally, script generates the files
+
+    ./nwchem_make_unenv.csh
+    ./nwchem_make_unenv.sh
+
+ which can be sourced to unset all the environment variables that the 
+ corresponding nwchem_make_env.* script has set.
+
+
+ ENVIRONMENT VARIABLES
+ ---------------------
+
+ The script will not override any user set environment variables. This allows
+ you to specify settings by hand that the script guesses wrong. Below is a list
+ of the environment variables the script tries to guess and what they 
+ control:
+
+ NWCHEM_TOP        -- The top level NWChem directory.
+                      Example: /home/mydir/nwchem-6.1.1.
+
+ NWCHEM_TARGET     -- The platform for which NWChem should be compiled. It
+                      should end in "64" if the machine provides a 64-bit
+                      platform. 
+                      Examples: BGP, LINUX, LINUX64, MACX, MACX64, IBM, IBM64.
+
+ NWCHEM_MODULES    -- A list of code modules your NWChem build should include. 
+                      Examples: "all", "qm", "qmandpw md", "all python".
+
+ NWCHEM_EXECUTABLE -- The full name of the NWChem executable.
+                      Example: /home/mydir/nwchem-6.1.1/bin/LINUX64/nwchem.
+
+ NWCHEM_VERSION    -- If set a routine listing the version numbers of all
+                      source code files will be included in the file
+                      util_version.F. The generation of this routine used to 
+                      be the default but now the code prints SVN revision
+                      numbers which in essence makes the old approach obsolete.
+                      The only place when the old approach is still useful is
+                      on machines without SVN. For those cases this environment
+                      variable may be set (any value will do) and the version
+                      routine will be generated.
+                      Examples: y, yes.
+
+ NWCHEM_LONG_PATHS -- If set to "Y" use a C-routine to compile in long pathnames
+                      for the basis set library location. Doing this requires
+                      the ISO_C_BINDING module from the Fortran 2008 standard
+                      which might not work with all Fortran compilers.
+
+ NWCHEM_FSCHECK    -- If set to "Y" build NWChem to include code to test the
+                      available disk space. This implies that every NWChem
+                      process will write a file called junk.*. This action has
+                      caused serious problems in the past including very long
+                      start up times, and failures of the file system.
+                      Therefore the default setting is "N".
+
+ NWCHEM_MPIF_WRAP  -- The name of the MPI Fortran compiler wrapper script.
+                      Example: mpif90.
+
+ NWCHEM_MPIC_WRAP  -- The name of the MPI C compiler wrapper script.
+                      Example: mpicc.
+
+ NWCHEM_MPICXX_WRAP-- The name of the MPI C++ compiler wrapper script.
+                      Example: mpicxx.
+
+ ARMCI_NETWORK     -- The communication infra-structure the ARMCI library in
+                      the GA should use. 
+                      Examples: DCMFMPI, GEMINI, PORTALS, OPENIB, MPI-MT.
+
+ MPI_F90           -- The Fortran compiler matching your MPI library.
+                      Examples: gfortran, ftn, ifort, xlf, pgf90.
+
+ MPI_CC            -- The C compiler matching your MPI library.
+                      Examples: gcc, cc, icc, xlc, pgcc.
+
+ MPI_CXX           -- The C++ compiler matching your MPI library.
+                      Examples: g++, CC, iCC, pgCC.
+
+ MPI_INCLUDE       -- The path at which the MPI include files live.
+                      Example: -I/usr/mpi/include.
+
+ MPI_LIB           -- The path at which the MPI libraries live.
+                      Example: -L/usr/mpi/lib.
+
+ LIBMPI            -- The MPI libraries to link against.
+                      Example: "-lmpichf90 -lmpichf90 -lmpich -lopa".
+
+ BLASOPT           -- Specifies the BLAS, LAPACK and maybe even ScaLAPACK
+                      libraries in a generic way. This setting overrides
+                      BLAS_LIB, LAPACK_LIB, and SCALAPACK_LIB as various 
+                      makefiles will use this regardless of anything.
+
+ BLAS_LIB          -- The BLAS linear algebra library to use.
+                      Examples: -lblas, -latlas, -lacml, -lmkl.
+
+ BLAS_SIZE         -- The size of the integers in bytes that the BLAS interface
+                      uses.
+                      Examples: 4, 8.
+
+ LAPACK_LIB        -- The LAPACK linear algebra library to use.
+                      Examples: -llapack, -lacml, -lmkl.
+
+ LAPACK_SIZE       -- The size of the integers in bytes that the LAPACK
+                      interface uses.
+                      Examples: 4, 8.
+
+ SCALAPACK_LIB     -- The ScaLAPACK linear algebra library to use.
+                      Examples: -lscalapack, -lacml, -lmkl.
+
+ SCALAPACK_SIZE    -- The size of the integers in bytes that the ScaLAPACK
+                      interface uses.
+                      Examples: 4, 8.
+
+ PYTHON_EXE        -- The full path of the Python executable.
+                      Example: /usr/bin/python.
+
+ PYTHONVERSION     -- The version of the Python installation.
+                      Examples: 2.4, 2.6.
+
+ PYTHONABIFLAGS    -- The ABI version of the Python installation.
+                      Examples: d, m, u, dm, dmu, mu.
+
+ USE_PYTHON64      -- If set assume Python is a 64-bit installation.
+                      Example: yes.
+
+ PYTHONPATH        -- The location where the Python packages are installed.
+                      Example: /usr/lib64/python2.4/site-packages
+
+ PYTHONHOME        -- The root tree under which the Python packages, libraries,
+                      and executable are installed.
+                      Example: /usr.
+
+ PYTHONLIBTYPE     -- The extension of the Python library (without the dot).
+                      Examples: a, so.
+
+
+ Notes:
+
+ The environment variables BLAS_SIZE, LAPACK_SIZE and SCALAPACK_SIZE all have 
+ to have the same value, either 4 or 8, to successfully build NWChem.
+
+ Huub van Dam
+ \$Id$
+EOF
+}
+# Compiler flags to try. First we try -q64 for 64 bit capabilities on IBM 
+# machines. If that fails we try the empty flag. On IBM that will default to
+# generate 32 bit executables, on other platforms we typically get what the
+# hardware is capable of.
+declare -a LIST_COMPFLAGS
+LIST_COMPFLAGS=( '-q64' ' ' )
+export LIST_COMPFLAGS
+#
+# Below are lists of existing MPI compiler wrappers. Note that Cray calls their
+# compiler wrappers ftn, cc, and CC without any hint to MPI.
+#
+declare -a LIST_MPIFWRAP
+LIST_MPIFWRAP=( 'mpiifort' 'mpifc' 'mpixlf_r' 'mpixlf' 'mpif90' 'mpif77' 'ftn')
+export LIST_MPIFWRAP
+declare -a LIST_MPICWRAP
+LIST_MPICWRAP=( 'mpiicc' 'mpixlc_r' 'mpixlc' 'mpigcc' 'mpicc' 'cc')
+export LIST_MPICWRAP
+declare -a LIST_MPICXXWRAP
+LIST_MPICXXWRAP=( 'mpiicpc' 'mpixlcxx_r' 'mpixlcxx' 'mpigxx' 'mpicxx' 'mpic++' 'mpiCC' 'CC')
+export LIST_MPICXXWRAP
+function get_mpi_fortran_wrapper()
+{
+   # Apparently it is too easy to call the MPI Fortran compiler wrapper mpif90.
+   # So now there is a variety of such scripts which may or may not be available
+   # on your machine. This function tries to find a Fortran compiler wrapper
+   # from a given list and returns the first one it finds.
+   lib=""
+   length=${#LIST_MPIFWRAP[*]}
+   indx=0
+   while [ "${indx}" -lt "${length}" ] ; do
+     candidate="${LIST_MPIFWRAP[${indx}]}"
+     ((indx++))
+     if [ ${#wrapper} -eq 0 ] ; then
+       wrapper=`which ${candidate} 2> /dev/null`
+     fi
+   done
+   if [ ${#wrapper} -eq 0 ] ; then
+     # We have not found anything suitable
+     echo ${wrapper}
+     return 1
+   fi
+   echo ${wrapper}
+}
+function get_mpi_c_wrapper()
+{
+   # Apparently it is too easy to call the MPI C compiler wrapper mpicc.
+   # So now there is a variety of such scripts which may or may not be available
+   # on your machine. This function tries to find a C compiler wrapper
+   # from a given list and returns the first one it finds.
+   lib=""
+   length=${#LIST_MPICWRAP[*]}
+   indx=0
+   while [ "${indx}" -lt "${length}" ] ; do
+     candidate="${LIST_MPICWRAP[${indx}]}"
+     ((indx++))
+     if [ ${#wrapper} -eq 0 ] ; then
+       wrapper=`which ${candidate} 2> /dev/null`
+     fi
+   done
+   if [ ${#wrapper} -eq 0 ] ; then
+     # We have not found anything suitable
+     echo ${wrapper}
+     return 1
+   fi
+   echo ${wrapper}
+}
+function get_mpi_cxx_wrapper()
+{
+   # Apparently it is too easy to call the MPI C++ compiler wrapper mpicxx.
+   # So now there is a variety of such scripts which may or may not be available
+   # on your machine. This function tries to find a C++ compiler wrapper
+   # from a given list and returns the first one it finds.
+   lib=""
+   length=${#LIST_MPICXXWRAP[*]}
+   indx=0
+   while [ "${indx}" -lt "${length}" ] ; do
+     candidate="${LIST_MPICXXWRAP[${indx}]}"
+     ((indx++))
+     if [ ${#wrapper} -eq 0 ] ; then
+       wrapper=`which ${candidate} 2> /dev/null`
+     fi
+   done
+   if [ ${#wrapper} -eq 0 ] ; then
+     # We have not found anything suitable
+     echo ${wrapper}
+     return 1
+   fi
+   echo ${wrapper}
+}
+function get_mpi_include ()
+{
+   # This shell function extracts the MPI include file directories
+   # and returns them as a list for a compile line.
+   # E.g.: /usr/include -I/usr/local/include
+   #
+   result=1
+   if [ ${result} -ne 0 ] ; then
+     #
+     # Cray supports -craype-verbose (-show means something different with Cray)
+     #
+     echo "       program test">/tmp/$$.f
+     echo "       end">>/tmp/$$.f
+     inlist="`${NWCHEM_MPIF_WRAP} -craype-verbose /tmp/$$.f`"
+     result=$?
+     rm -f /tmp/$$.f
+     if [ ${result} -eq 0 ] ; then
+       inlist=""
+     fi
+   fi
+   if [ ${result} -ne 0 ] ; then
+     #
+     # Most support -show
+     #
+     inlist="`${NWCHEM_MPIF_WRAP} -show`"
+     result=$?
+   fi
+   if [ ${result} -ne 0 ] ; then
+     #
+     # OPENMPI supports -showme
+     #
+     inlist="`${NWCHEM_MPIF_WRAP} -showme`"
+     result=$?
+   fi
+   if [ ${result} -ne 0 ] ; then
+     #
+     # MPICH2 and MVAPICH2 support -link-info
+     #
+     inlist="`${NWCHEM_MPIF_WRAP} -link-info`"
+     result=$?
+   fi
+   if [ ${result} -ne 0 ] ; then
+     echo "ERROR: cannot get compile info from ${NWCHEM_MPIF_WRAP}" > /dev/stderr
+     exit 1
+   fi
+   outlist=""
+   for word in ${inlist} ; do
+      len=`expr "${word}" : '-I*'`
+      if [ ${len} -ge 2 ] ; then
+        outlist="${outlist} ${word}"
+      fi
+   done
+#  len=`expr "${outlist}" : ' -I*'`
+#  if [ ${len} -ge 3 ] ; then
+#    outlist="${outlist:3}"
+#  fi
+   echo ${outlist}
+}
+function get_mpi_link ()
+{
+   # This shell function extracts the MPI library file directories
+   # and returns them as a list for a link line.
+   # E.g.: /usr/lib -L/usr/local/lib
+   #
+   result=1
+   if [ ${result} -ne 0 ] ; then
+     #
+     # Cray supports -craype-verbose (-show means something else with Cray)
+     #
+     echo "       program test">/tmp/$$.f
+     echo "       end">>/tmp/$$.f
+     inlist="`${NWCHEM_MPIF_WRAP} -craype-verbose /tmp/$$.f`"
+     result=$?
+     rm -f /tmp/$$.f
+     if [ ${result} -eq 0 ] ; then
+       inlist=""
+     fi
+   fi
+   if [ ${result} -ne 0 ] ; then
+     #
+     # most support -show
+     #
+     inlist="`${NWCHEM_MPIF_WRAP} -show`"
+     result=$?
+   fi
+   if [ ${result} -ne 0 ] ; then
+     #
+     # OPENMPI supports -showme
+     #
+     inlist="`${NWCHEM_MPIF_WRAP} -showme`"
+     result=$?
+   fi
+   if [ ${result} -ne 0 ] ; then
+     #
+     # Otherwise try -link-info
+     #
+     inlist="`${NWCHEM_MPIF_WRAP} -link-info`"
+     result=$?
+   fi
+   if [ ${result} -ne 0 ] ; then
+     echo "ERROR: cannot get link info from ${NWCHEM_MPIF_WRAP}" > /dev/stderr
+     exit 1
+   fi
+   outlist=""
+   for word in ${inlist} ; do
+      len=`expr "${word}" : '-L*'`
+      if [ ${len} -ge 2 ] ; then
+        outlist="${outlist} ${word}"
+      fi
+   done
+#  len=`expr "${outlist}" : ' -L*'`
+#  if [ ${len} -ge 3 ] ; then
+#    outlist="${outlist:3}"
+#  fi
+   echo ${outlist}
+}
+function get_mpi_lib ()
+{
+   # This shell function extracts the MPI libraries
+   # and returns them as a list for a link line.
+   # E.g.: -lmpich
+   #
+   result=1
+   if [ ${result} -ne 0 ] ; then
+     #
+     # Cray supports -craype-verbose (-show means something else with Cray)
+     #
+     echo "       program test">/tmp/$$.f
+     echo "       end">>/tmp/$$.f
+     inlist="`${NWCHEM_MPIF_WRAP} -craype-verbose /tmp/$$.f`"
+     result=$?
+     rm -f /tmp/$$.f
+     if [ ${result} -eq 0 ] ; then
+       inlist=""
+     fi
+   fi
+   if [ ${result} -ne 0 ] ; then
+     #
+     # Most support -show
+     #
+     inlist="`${NWCHEM_MPIF_WRAP} -show`"
+     result=$?
+   fi
+   if [ ${result} -ne 0 ] ; then
+     #
+     # OPENMPI supports -showme
+     #
+     inlist="`${NWCHEM_MPIF_WRAP} -showme`"
+     result=$?
+   fi
+   if [ ${result} -ne 0 ] ; then
+     #
+     # MPICH2 and MVAPICH2 support -link-info
+     #
+     inlist="`${NWCHEM_MPIF_WRAP} -link-info`"
+     result=$?
+   fi
+   if [ ${result} -ne 0 ] ; then
+     echo "ERROR: cannot get library info from ${NWCHEM_MPIF_WRAP}" > /dev/stderr
+     exit 1
+   fi
+   outlist=""
+   for word in ${inlist} ; do
+      len=`expr "${word}" : '-l*'`
+      if [ ${len} -ge 2 ] ; then
+        outlist="${outlist} ${word}"
+      fi
+   done
+   echo ${outlist}
+}
+function get_mpi_fortran ()
+{
+   # This shell function extracts the fortran compiler
+   # and returns its name as a list for a compile line.
+   # E.g.: gfortran
+   #
+   result=1
+   if [ ${result} -ne 0 ] ; then
+     #
+     # Cray supports -craype-verbose (Cray also supports -show but that means
+     # listing all known environment variables)
+     #
+     echo "       program test">/tmp/$$.f
+     echo "       end">>/tmp/$$.f
+     inlist="`${NWCHEM_MPIF_WRAP} -craype-verbose /tmp/$$.f`"
+     result=$?
+     rm -f /tmp/$$.f
+     if [ ${result} -eq 0 ] ; then
+       if [ ${#inlist} -eq 0 ]; then
+         # -craype-verbose flag was not recognized
+         result=1
+       else
+         inlist="ftn"
+       fi
+     fi
+   fi
+   if [ ${result} -ne 0 ] ; then
+     #
+     # Most support -show
+     #
+     inlist="`${NWCHEM_MPIF_WRAP} -show`"
+     result=$?
+   fi
+   if [ ${result} -ne 0 ] ; then
+     #
+     # OPENMPI supports -showme
+     #
+     inlist="`${NWCHEM_MPIF_WRAP} -showme`"
+     result=$?
+   fi
+   if [ ${result} -ne 0 ] ; then
+     #
+     # MPICH2 and MVAPICH2 support -compile-info
+     #
+     inlist="`${NWCHEM_MPIF_WRAP} -compile-info`"
+     result=$?
+   fi
+   if [ ${result} -ne 0 ] ; then
+     echo "ERROR: cannot get compile info from ${NWCHEM_MPIF_WRAP}" > /dev/stderr
+     exit 1
+   fi
+   outlist=""
+   length=${#LIST_COMPFLAGS[*]}
+   for word in ${inlist} ; do
+      echo "c23456 test program">/tmp/$$.f
+      echo "       program test">>/tmp/$$.f
+      echo "       write(6,'(\"hello world\")')">>/tmp/$$.f
+      echo "       end">>/tmp/$$.f
+      word=`basename ${word}`
+      indx=0
+      while [ "${indx}" -lt "${length}" ] ; do
+         flags=${LIST_COMPFLAGS[$indx]}
+         ((indx++))
+         ${word} ${flags} -o /tmp/$$.x /tmp/$$.f
+         result=$?
+         if [ ${result} -eq 0 ] ; then
+           /tmp/$$.x > /dev/null
+           result=$?
+           if [ ${result} -eq 0 ] ; then
+             echo ${word}
+             rm -f /tmp/$$.x /tmp/$$.o /tmp/$$.f
+             return 0
+           fi
+         fi
+      done
+   done
+   rm -f /tmp/$$.x /tmp/$$.o /tmp/$$.f
+   echo "ERROR: could not find a valid Fortran compiler" > /dev/stderr
+   exit 1
+}
+function get_mpi_cc ()
+{
+   # This shell function extracts the C compiler
+   # and returns its name as a list for a compile line.
+   # E.g.: gcc
+   #
+   result=1
+   if [ ${result} -ne 0 ] ; then
+     #
+     # Cray supports -craype-verbose (-show means something else with Cray)
+     #
+     echo "int main(void){">>/tmp/$$.c
+     echo "    return 0;">>/tmp/$$.c
+     echo "}">>/tmp/$$.c
+     inlist="`${NWCHEM_MPIC_WRAP} -craype-verbose /tmp/$$.c`"
+     result=$?
+     rm -f /tmp/$$.c
+     if [ ${result} -eq 0 ] ; then
+       if [ ${#inlist} -eq 0 ] ; then
+         # -craype-verbose flag was not recognized
+         result=1
+       else
+         inlist="cc"
+       fi
+     fi
+   fi
+   if [ ${result} -ne 0 ] ; then
+     #
+     # Most support -show
+     #
+     inlist="`${NWCHEM_MPIC_WRAP} -show`"
+     result=$?
+   fi
+   if [ ${result} -ne 0 ] ; then
+     #
+     # OPENMPI supports -showme
+     #
+     inlist="`${NWCHEM_MPIC_WRAP} -showme`"
+     result=$?
+   fi
+   if [ ${result} -ne 0 ] ; then
+     #
+     # MPICH2 and MVAPICH2 support -compile-info
+     #
+     inlist="`${NWCHEM_MPIC_WRAP} -compile-info`"
+     result=$?
+   fi
+   if [ ${result} -ne 0 ] ; then
+     echo "ERROR: cannot get compile info from ${NWCHEM_MPIC_WRAP}" > /dev/stderr
+     exit 1
+   fi
+   outlist=""
+   length=${#LIST_COMPFLAGS[*]}
+   for word in ${inlist} ; do
+      echo "#include <stdio.h>">/tmp/$$.c
+      echo "int main(void){">>/tmp/$$.c
+      echo "    printf(\"hello world\n\");">>/tmp/$$.c
+      echo "    return 0;">>/tmp/$$.c
+      echo "}">>/tmp/$$.c
+      word=`basename ${word}`
+      indx=0
+      while [ "${indx}" -lt "${length}" ] ; do
+         flags=${LIST_COMPFLAGS[$indx]}
+         ((indx++))
+         ${word} ${flags} -o /tmp/$$.x /tmp/$$.c
+         result=$?
+         if [ ${result} -eq 0 ] ; then
+           /tmp/$$.x > /dev/null
+           result=$?
+           if [ ${result} -eq 0 ] ; then
+             echo ${word}
+             rm -f /tmp/$$.x /tmp/$$.o /tmp/$$.c
+             return 0
+           fi
+         fi
+      done
+   done
+   rm -f /tmp/$$.x /tmp/$$.o /tmp/$$.c
+   echo "ERROR: could not find a valid C compiler" > /dev/stderr
+   exit 1
+}
+function get_mpi_cxx ()
+{
+   # This shell function extracts the C++ compiler
+   # and returns its name as a list for a compile line.
+   # Because there are some case insensitive file systems we
+   # have to try mpic++ and mpicxx first because if they are
+   # not found mpiCC will find the C-compiler wrapper script
+   # on those systems.
+   # E.g.: g++
+   #
+   result=1
+   if [ ${result} -ne 0 ] ; then
+     #
+     # Cray supports -craype-verbose (-show means something else with Cray)
+     #
+     echo "int main(void){">>/tmp/$$.cpp
+     echo "    return 0;">>/tmp/$$.cpp
+     echo "}">>/tmp/$$.cpp
+     inlist="`${NWCHEM_MPICXX_WRAP} -craype-verbose /tmp/$$.cpp`"
+     result=$?
+     rm -f /tmp/$$.cpp
+     if [ ${result} -eq 0 ] ; then
+       if [ ${#inlist} -eq 0 ] ; then
+         # -craype-verbose flag was not recognized
+         result=1
+       else
+         inlist="CC"
+       fi
+     fi
+   fi
+   if [ ${result} -ne 0 ] ; then
+     #
+     # Most support -show
+     #
+     inlist="`${NWCHEM_MPICXX_WRAP} -show`"
+     result=$?
+   fi
+   if [ ${result} -ne 0 ] ; then
+     #
+     # OPENMPI supports -showme
+     #
+     inlist="`${NWCHEM_MPICXX_WRAP} -showme`"
+     result=$?
+   fi
+   if [ ${result} -ne 0 ] ; then
+     #
+     # MPICH2 and MVAPICH2 support -compile-info
+     #
+     inlist="`${NWCHEM_MPICXX_WRAP} -compile-info`"
+     result=$?
+   fi
+   if [ ${result} -ne 0 ] ; then
+     echo "ERROR: cannot get compile info from ${NWCHEM_MPICXX_WRAP}" > /dev/stderr
+     exit 1
+   fi
+   outlist=""
+   length=${#LIST_COMPFLAGS[*]}
+   for word in ${inlist} ; do
+      echo "#include <iostream>">/tmp/$$.cpp
+      echo "int main(void) {">>/tmp/$$.cpp
+      echo "    std::cout << \"hello world\n\";">>/tmp/$$.cpp
+      echo "    return 0;">>/tmp/$$.cpp
+      echo "}">>/tmp/$$.cpp
+      word=`basename ${word}`
+      indx=0
+      while [ "${indx}" -lt "${length}" ] ; do
+         flags=${LIST_COMPFLAGS[$indx]}
+         ((indx++))
+         ${word} ${flags} -o /tmp/$$.x /tmp/$$.cpp
+         result=$?
+         if [ ${result} -eq 0 ] ; then
+           /tmp/$$.x > /dev/null
+           result=$?
+           if [ ${result} -eq 0 ] ; then
+             echo ${word}
+             rm -f /tmp/$$.x /tmp/$$.o /tmp/$$.cpp
+             return 0
+           fi
+         fi
+      done
+   done
+   rm -f /tmp/$$.x /tmp/$$.o /tmp/$$.cpp
+   echo "ERROR: could not find a valid C++ compiler" > /dev/stderr
+   exit 1
+}
+function get_config_value()
+{
+   # This function extracts the value of a setting in config.status.
+   # The approach is to simply grep the key on the config.status file.
+   # We expect to get 1 line in response, and we return whatever appears
+   # after the equals sign.
+   key=$1
+   line=`grep $key ${NWCHEM_TOP}/src/tools/build/config.status`
+   line=${line/*=/}
+   line=${line/#\"/}
+   line=${line/%\"/}
+   echo ${line}
+}
+function config_is_set()
+{
+   # This function retrieves the value of a seting in config.status according
+   # to the key specified. It then checks the length of the result. If
+   # the result was "" (length <= 0) then it was not set, otherwise it is.
+   key=$1
+   result=`get_config_value $key`
+   if [ ${#result} -gt 0 ] ; then
+     value=0
+   else
+     value=1
+   fi
+   echo ${value}
+}
+function get_blas_lib()
+{
+   # This function tries to find a BLAS library. Any library found must allow
+   # a Fortran program that calls BLAS routines to compile, link and run.
+   # The first library that matches these criteria is returned.
+   fcomp=$1
+   blasopt="$2"
+   extralibs="$3"
+   # echo "extralibs:" ${extralibs} > /dev/stderr
+   if [ ${#fcomp} -eq 0 ] ; then
+       echo
+       return
+   fi
+   lib=""
+   candidate="${blasopt}"
+   if [ ${#lib} -eq 0 ] ; then
+       echo "      program testblas" > testblas$$.f
+       echo "      implicit none" >> testblas$$.f
+       echo "      double precision a, b, c" >> testblas$$.f
+       echo "      integer*8 n, m, k" >> testblas$$.f
+       echo "      integer*8 lda" >> testblas$$.f
+       echo "      a = 1.0d0" >> testblas$$.f
+       echo "      b = 2.0d0" >> testblas$$.f
+       echo "      c = 0.0d0" >> testblas$$.f
+       echo "      lda = 1" >> testblas$$.f
+       echo "      n = 1" >> testblas$$.f
+       echo "      m = 1" >> testblas$$.f
+       echo "      k = 1" >> testblas$$.f
+       echo "      call dgemm('n','n',m,n,k,1.0d0,a,lda,b,lda,0.0d0,c,lda)" >> testblas$$.f
+       echo "      end" >> testblas$$.f
+       $fcomp -o testblas$$.x testblas$$.f ${candidate} ${extralibs} > /dev/null
+       result=$?
+       if [ ${result} -eq 0 ] ; then
+         ./testblas$$.x > /dev/null
+         result=$?
+         if [ ${result} -eq 0 ] ; then
+           # This library worked so we will go with this
+           lib="${candidate}"
+           # echo "blas: found ${lib}" > /dev/stderr
+         fi
+         rm -f ./testblas$$.x
+       fi
+       rm -f ./testblas$$.f
+   fi
+   if [ ${#lib} -eq 0 ] ; then
+     # We have not found anything suitable
+     echo ${lib}
+     return 1
+   fi
+   echo ${lib}
+}
+function get_blas_integer()
+{
+   #
+   # Establish whether the BLAS library found uses integer*4 or integer*8.
+   #
+   fcomp=$1
+   blaslib=$2
+   echo "      program testblasint" > ./testblas$$.f
+   echo "      implicit none" >> ./testblas$$.f
+   echo "      integer*8 typecast" >> ./testblas$$.f
+   echo "      integer*4 data(2)" >> ./testblas$$.f
+   echo "      double precision a, b, c" >> ./testblas$$.f
+   echo "      integer*8 n, m, k, ld" >> ./testblas$$.f
+   echo "      integer*8 two" >> ./testblas$$.f
+   echo "      external  typecast" >> ./testblas$$.f
+   echo "      logical   obigendian" >> ./testblas$$.f
+   echo "      a = 0.5d0" >> ./testblas$$.f
+   echo "      b = 2.0d0" >> ./testblas$$.f
+   echo "      c = 0.0d0" >> ./testblas$$.f
+   echo "      data(1) = 0" >> ./testblas$$.f
+   echo "      data(2) = 1" >> ./testblas$$.f
+   echo "      obigendian = (1.eq.typecast(data))" >> ./testblas$$.f
+   echo "      two = 2" >> ./testblas$$.f
+   echo "      if (obigendian) then" >> ./testblas$$.f
+   echo "        n  = two**32+two**0" >> ./testblas$$.f
+   echo "        m  = two**32+two**1" >> ./testblas$$.f
+   echo "        k  = two**32+two**2" >> ./testblas$$.f
+   echo "        ld = two**32" >> ./testblas$$.f
+   echo "      else" >> ./testblas$$.f
+   echo "        n  = two**32+two**0" >> ./testblas$$.f
+   echo "        m  = two**33+two**0" >> ./testblas$$.f
+   echo "        k  = two**34+two**0" >> ./testblas$$.f
+   echo "        ld = two**0" >> ./testblas$$.f
+   echo "      endif" >> ./testblas$$.f
+   echo "      call dgemm('n','n',m,n,k,1.0d0,a,ld,b,ld,0.0d0,c,ld)" >> ./testblas$$.f
+   echo "      if (abs(c-1.0d0).lt.1.0d-10) then" >> ./testblas$$.f
+   echo "        write(*,'(a)')'4'" >> ./testblas$$.f
+   echo "      else" >> ./testblas$$.f
+   echo "        write(*,'(a)')'8'" >> ./testblas$$.f
+   echo "      endif" >> ./testblas$$.f
+   echo "      end" >> ./testblas$$.f
+   echo "      integer*8 function typecast(input)" >> ./testblas$$.f
+   echo "      implicit none" >> ./testblas$$.f
+   echo "      integer*8 input" >> ./testblas$$.f
+   echo "      typecast = input" >> ./testblas$$.f
+   echo "      return" >> ./testblas$$.f
+   echo "      end" >> ./testblas$$.f
+   if [ ${fcomp} == "ftn" ] ; then
+     # On Titan we need to build the test program for the login nodes to 
+     # avoid getting an ILLEGAL INSTRUCTION when attempting floating point operations
+     ${fcomp} -target-cpu=mc8 -o ./testblas$$.x ./testblas$$.f ${blaslib}
+   else
+     ${fcomp} -o ./testblas$$.x ./testblas$$.f ${blaslib}
+   fi
+   result=`./testblas$$.x`
+   status=$?
+   if [ ${status} -ne 0 ] ; then
+     result="8"
+   else
+     out=`expr "${result}" : '.*\(4\)'`
+     if [ "${out}" == "4" ] ; then
+       result="4"
+     else
+       out=`expr "${result}" : '.*\(8\)'`
+       if [ "${out}" == "8" ] ; then
+         result="8"
+       else
+         result="0"
+       fi
+     fi
+   fi
+   rm -f ./testblas$$.f
+   rm -f ./testblas$$.x
+   echo ${result}
+}
+function get_lapack_lib()
+{
+   # This function tries to find a LAPACK library. Any library found must allow
+   # a Fortran program that calls LAPACK routines to compile, link and run.
+   # The first library that matches these criteria is returned.
+   fcomp=$1
+   if [ ${#fcomp} -eq 0 ] ; then
+       echo
+       return
+   fi
+   blas=$2
+   blasopt="$3"
+   extralibs="$4"
+   lib=""
+   candidate="${blasopt}"
+   if [ ${#lib} -eq 0 ] ; then
+       echo "      program testlapack" > testlapack$$.f
+       echo "      implicit none" >> testlapack$$.f
+       echo "      double precision a, w, work" >> testlapack$$.f
+       echo "      integer*8 n" >> testlapack$$.f
+       echo "      integer*8 lda" >> testlapack$$.f
+       echo "      integer*8 lwork, info" >> testlapack$$.f
+       echo "      a = 1.0d0" >> testlapack$$.f
+       echo "      lda = 1" >> testlapack$$.f
+       echo "      n = 1" >> testlapack$$.f
+       echo "      lwork = -1" >> testlapack$$.f
+       echo "      call dsyev('n','u',n,a,lda,w,work,lwork,info)" >> testlapack$$.f
+       echo "      end" >> testlapack$$.f
+       $fcomp -o testlapack$$.x testlapack$$.f ${candidate} ${blas} ${extralibs} > /dev/null
+       result=$?
+       if [ ${result} -eq 0 ] ; then
+         ./testlapack$$.x > /dev/null
+         result=$?
+         if [ ${result} -eq 0 ] ; then
+           # This library worked so we will go with this
+           lib="${candidate}"
+           # echo "lapack: found ${lib}" > /dev/stderr
+         fi
+         rm -f ./testlapack$$.x
+       fi
+       rm -f ./testlapack$$.f
+   fi
+   if [ ${#lib} -eq 0 ] ; then
+     # We have not found anything suitable
+     echo ${lib}
+     return 1
+   fi
+   echo ${lib}
+}
+function get_lapack_integer()
+{
+   # This function works out whether the LAPACK library uses 
+   # an integer*4 or integer*8 interface.
+   fcomp=$1
+   blaslapack=$2
+   echo "      program testlapackint" > ./testlapack$$.f
+   echo "      implicit none" >> ./testlapack$$.f
+   echo "      integer*8 typecast" >> ./testlapack$$.f
+   echo "      integer*4 data(2)" >> ./testlapack$$.f
+   echo "      double precision a, w, ww(10)" >> ./testlapack$$.f
+   echo "      integer*8 n, ld, lw" >> ./testlapack$$.f
+   echo "      integer*8 two" >> ./testlapack$$.f
+   echo "      integer*8 info" >> ./testlapack$$.f
+   echo "      external  typecast" >> ./testlapack$$.f
+   echo "      logical   obigendian" >> ./testlapack$$.f
+   echo "      a = 0.5d0" >> ./testlapack$$.f
+   echo "      w = 1.0d0" >> ./testlapack$$.f
+   echo "      data(1) = 0" >> ./testlapack$$.f
+   echo "      data(2) = 1" >> ./testlapack$$.f
+   echo "      obigendian = (1.eq.typecast(data))" >> ./testlapack$$.f
+   echo "      two = 2" >> ./testlapack$$.f
+   echo "      info = 0" >> ./testlapack$$.f
+   echo "      if (obigendian) then" >> ./testlapack$$.f
+   echo "        n  = two**32+two**0" >> ./testlapack$$.f
+   echo "        lw = 10*two**32+two**0" >> ./testlapack$$.f
+   echo "        ld = two**32" >> ./testlapack$$.f
+   echo "      else" >> ./testlapack$$.f
+   echo "        n  = two**32+two**0" >> ./testlapack$$.f
+   echo "        lw = two**32+10*two**0" >> ./testlapack$$.f
+   echo "        ld = two**0" >> ./testlapack$$.f
+   echo "      endif" >> ./testlapack$$.f
+   echo "      call dsyev('n','u',n,a,ld,w,ww,lw,info)" >> testlapack$$.f
+   echo "      if (info.eq.0) then" >> ./testlapack$$.f
+   echo "        write(*,'(a)')'4'" >> ./testlapack$$.f
+   echo "      else" >> ./testlapack$$.f
+   echo "        write(*,'(a)')'8'" >> ./testlapack$$.f
+   echo "      endif" >> ./testlapack$$.f
+   echo "      end" >> ./testlapack$$.f
+   echo "      integer*8 function typecast(input)" >> ./testlapack$$.f
+   echo "      implicit none" >> ./testlapack$$.f
+   echo "      integer*8 input" >> ./testlapack$$.f
+   echo "      typecast = input" >> ./testlapack$$.f
+   echo "      return" >> ./testlapack$$.f
+   echo "      end" >> ./testlapack$$.f
+   $fcomp -o testlapack$$.x testlapack$$.f ${blaslapack} > /dev/null
+   result=`./testlapack$$.x`
+   status=$?
+   if [ ${status} -ne 0 ] ; then
+     result=8
+   elif [ "${result}" != "4" ] ; then
+     result=8
+   fi
+   rm -f ./testlapack$$.x
+   rm -f ./testlapack$$.f
+   echo ${result}
+}
+function get_scalapack_lib()
+{
+   # This function tries to find a ScaLAPACK library. Any library found must allow
+   # a Fortran program that calls ScaLAPACK routines to compile, link and run.
+   # The first library that matches these criteria is returned.
+   fcomp=$1
+   lapackblas=$2
+   blasopt="$3"
+   extralibs="$4"
+   if [ ${#fcomp} -eq 0 ] ; then
+       echo
+       return
+   fi
+   lib=""
+   candidate="${blasopt}"
+   if [ ${#lib} -eq 0 ] ; then
+       echo "      program testscalapack" > testscalapack$$.f
+       echo "      implicit none" >> testscalapack$$.f
+       echo "      double precision a, b" >> testscalapack$$.f
+       echo "      integer*8 n" >> testscalapack$$.f
+       echo "      integer*8 ia,ja,ib,jb, info" >> testscalapack$$.f
+       echo "      integer*8 desca(1),descb(1),ipiv(2)" >> testscalapack$$.f
+       echo "      a = 2.0d0" >> testscalapack$$.f
+       echo "      b = 1.0d0" >> testscalapack$$.f
+       echo "      ia = 1" >> testscalapack$$.f
+       echo "      ja = 1" >> testscalapack$$.f
+       echo "      ib = 1" >> testscalapack$$.f
+       echo "      jb = 1" >> testscalapack$$.f
+       echo "      n = 1" >> testscalapack$$.f
+       echo "      call pdgetrs('n',n,n,a,ia,ja,desca,ipiv,b,ib,jb,descb,info)" >> testscalapack$$.f
+       echo "      end" >> testscalapack$$.f
+       $fcomp -o testscalapack$$.x testscalapack$$.f ${candidate} ${lapackblas} ${extralibs} > /dev/null
+       result=$?
+       if [ ${result} -eq 0 ] ; then
+         ./testscalapack$$.x > /dev/null
+         result=$?
+         if [ ${result} -eq 0 ] ; then
+           # This library worked so we will go with this
+           lib="${candidate}"
+           # echo "lapack: found ${lib}" > /dev/stderr
+         fi
+         rm -f ./testscalapack$$.x
+       fi
+       rm -f ./testscalapack$$.o
+       rm -f ./testscalapack$$.f
+   fi
+   if [ ${#lib} -eq 0 ] ; then
+     # We have not found anything suitable
+     echo ${lib}
+     return 1
+   fi
+   echo ${lib}
+}
+function get_scalapack_integer()
+{
+   # This function works out whether the LAPACK library uses 
+   # an integer*4 or integer*8 interface.
+   fcomp=$1
+   blaslapacksca=$2
+   echo "      program testscalapack" > testscalapack$$.f
+   echo "      implicit none" >> testscalapack$$.f
+   echo "      double precision a, b" >> testscalapack$$.f
+   echo "      integer*8 n" >> testscalapack$$.f
+   echo "      integer*8 ia,ja,ib,jb" >> testscalapack$$.f
+   echo "      integer*8 id(9),ip(10)" >> testscalapack$$.f
+   echo "      integer*8 info" >> testscalapack$$.f
+   echo "      integer*8 typecast" >> testscalapack$$.f
+   echo "      logical   integer8" >> testscalapack$$.f
+   echo "      external  typecast,integer8" >> testscalapack$$.f
+   echo "      integer*4 data(2)" >> testscalapack$$.f
+   echo "      a = 1.0d0" >> testscalapack$$.f
+   echo "      b = 1.0d0" >> testscalapack$$.f
+   echo "      do ia = 1, 9" >> testscalapack$$.f
+   echo "        id(ia) = -1" >> testscalapack$$.f
+   echo "      enddo" >> testscalapack$$.f
+   echo "      ia = 0" >> testscalapack$$.f
+   echo "      ib = 0" >> testscalapack$$.f
+   echo "      data(1) = -1" >> testscalapack$$.f
+   echo "      data(2) = -1" >> testscalapack$$.f
+   echo "      ja = typecast(data)" >> testscalapack$$.f
+   echo "      jb = typecast(data)" >> testscalapack$$.f
+   echo "      data(2) = 0" >> testscalapack$$.f
+   echo "      data(1) = 8" >> testscalapack$$.f
+   echo "      n = typecast(data)" >> testscalapack$$.f
+   echo "      data(1) = 999999" >> testscalapack$$.f
+   echo "      data(2) = 999999" >> testscalapack$$.f
+   echo "      info = typecast(data)" >> testscalapack$$.f
+   echo "      call pdgetrs('n',n,n,a,ia,ja,id,ip,b,ib,jb,id,info)" >> testscalapack$$.f
+   echo "      if (integer8(data,info)) then" >> testscalapack$$.f
+   echo "        write(*,'(a)')'8'" >> ./testscalapack$$.f
+   echo "      else" >> ./testscalapack$$.f
+   echo "        write(*,'(a)')'4'" >> ./testscalapack$$.f
+   echo "      endif" >> ./testscalapack$$.f
+   echo "      end" >> testscalapack$$.f
+   echo "      integer*8 function typecast(input)" >> ./testscalapack$$.f
+   echo "      implicit none" >> testscalapack$$.f
+   echo "      integer*8 input" >> ./testscalapack$$.f
+   echo "      typecast = input" >> ./testscalapack$$.f
+   echo "      return" >> ./testscalapack$$.f
+   echo "      end" >> ./testscalapack$$.f
+   echo "      logical function integer8(data,input)" >> ./testscalapack$$.f
+   echo "      implicit none" >> testscalapack$$.f
+   echo "      integer*4 input(2),data(2)" >> ./testscalapack$$.f
+   echo "      integer8 = (input(1).ne.data(1)).and.(input(2).ne.data(2))" >> ./testscalapack$$.f
+   echo "      return" >> ./testscalapack$$.f
+   echo "      end" >> ./testscalapack$$.f
+   $fcomp -o testscalapack$$.x testscalapack$$.f ${blaslapacksca} > /dev/null
+   result=`./testscalapack$$.x`
+   out=`expr "${result}" : '.*\(4\)'`
+   if [ "${out}" != "4" ] ; then
+     out=`expr "${result}" : '.*\(8\)'`
+     if [ "${out}" != "8" ] ; then
+       out="0"
+     fi
+   fi
+   rm -f ./testscalapack$$.x
+   rm -f ./testscalapack$$.o
+   rm -f ./testscalapack$$.f
+   echo ${out}
+}
+function get_pointer_size ()
+{
+   # This shell function works out whether pointers
+   # are 8- or 4-bytes on this platform. This function
+   # expects to be given the compiler to use as an input.
+   declare -a list
+   ccomp=$1
+   output=""
+   length=${#LIST_COMPFLAGS[*]}
+   echo "#include <stdio.h>">/tmp/$$.c
+   echo "int main(void){">>/tmp/$$.c
+   echo "    int* ptr = NULL;">>/tmp/$$.c
+   echo "    int size = sizeof(ptr);">>/tmp/$$.c
+   echo "    printf(\"%d\n\",size);">>/tmp/$$.c
+   echo "    return 0;">>/tmp/$$.c
+   echo "}">>/tmp/$$.c
+   indx=0
+   while [ "${indx}" -lt "${length}" ] ; do
+     flags=${LIST_COMPFLAGS[$indx]}
+     ((indx++))
+     ${ccomp} ${flags} -o /tmp/$$.x /tmp/$$.c
+     result=$?
+     if [ ${result} -eq 0 ] ; then
+       output=`/tmp/$$.x`
+       result=$?
+       if [ ${result} -eq 0 ] ; then
+         echo ${output}
+         rm -f  /tmp/$$.c /tmp/$$.o /tmp/$$.x
+         return 0
+       fi
+     fi
+   done
+   rm -f  /tmp/$$.c /tmp/$$.o /tmp/$$.x
+   echo "ERROR: could not establish the pointer size" > /dev/stderr
+   exit 1
+}
+function fortran_has_iso_c_binding ()
+{
+   # This shell function works out whether the fortran compiler supports
+   # the ISO_C_BINDING module. 
+   #
+   fcomp=$1
+   outlist=""
+   echo "c23456 test program">/tmp/testiso$$.f
+   echo "       program test">>/tmp/testiso$$.f
+   echo "       use iso_c_binding">>/tmp/testiso$$.f
+   echo "       character (KIND=C_CHAR,LEN=256) :: line">>/tmp/testiso$$.f
+   echo "       integer (C_INT) :: length">>/tmp/testiso$$.f
+   echo "       length=len(line)">>/tmp/testiso$$.f
+   echo "       line='hello world'">>/tmp/testiso$$.f
+   echo "       write(6,'(\"line=\",a,\"length=\",i6)')line,length">>/tmp/testiso$$.f
+   echo "       end">>/tmp/testiso$$.f
+   $fcomp -o /tmp/testiso$$.x /tmp/testiso$$.f > /dev/null
+   result=$?
+   if [ ${result} -eq 0 ] ; then
+       /tmp/testiso$$.x > /dev/null
+       result=$?
+       if [ ${result} -eq 0 ] ; then
+           echo Y
+           rm -f /tmp/testiso$$.x /tmp/testiso$$.o /tmp/testiso$$.f
+           return 0
+       fi
+   fi
+   rm -f /tmp/testiso$$.x /tmp/testiso$$.o /tmp/testiso$$.f
+   echo "ERROR: Fortran compiler does not support ISO_C_BINDING" > /dev/stderr
+   echo N
+   exit 1
+}
+#
+# Decide what we need to do here
+#
+option=$1
+if [ "$option" == "help" ] ; then
+  usage
+  exit 1
+elif [ "$option" == "" ] ; then
+  echo > /dev/null
+elif [ "$option" == "realclean" ] ; then
+  echo > /dev/null
+#elif [ "$option" == "python" ] ; then
+#  echo > /dev/null
+#elif [ "$option" == "python64" ] ; then
+#  echo > /dev/null
+else
+  usage
+  exit 1
+fi
+#
+# Check whether NWCHEM_TOP is set to something sensible...
+#
+if [ ${#RELEASE} -ne 0 ] ; then
+  if [ ${#NWCHEM_TOP} -ne 0 ] ; then
+    echo "${NWCHEM_TOP}" | grep "${RELEASE}" > /dev/null
+    status=$?
+    if [ ${status} -ne 0 ] ; then
+      export NWCHEM_TOP=${NWCHEM_TOP}-${RELEASE}
+    fi
+  fi
+fi
+#
+# Deal with the FSCHECK. This file system check tries to figure out how much
+# disk space we have. As part of this it will trigger junk files to be written
+# from every process. In the past this has caused major problems like hangs and
+# code crashes. Therefore the default is now to turn this FSCHECK mechanism
+# off.
+#
+if [ ${#NWCHEM_FSCHECK} -eq 0 ] ; then
+  export USE_NOFSCHECK=Y
+elif [ ${NWCHEM_FSCHECK} == "Y" ] ; then
+  if [ ${#USE_NOFSCHECK} -ne 0 ] ; then
+    unset USE_NOFSCHECK
+  fi
+else
+  export USE_NOFSCHECK=Y
+fi
+#
+# See if we can detect which platform we are on.
+# This is most relevant to the various BlueGene platforms as they are a complete
+# package, i.e. if you know you are on a BlueGene/P then all required settings
+# are prescribed. This is not the case on other platforms.
+#
+echo "=== figure out Network, MPI, and LinAlg libraries ==="
+if [ -f /bgsys/drivers/ppcfloor/comm/sys/include/dcmf.h ] ; then
+  #
+  # This is a BlueGene/P machine
+  #
+  if [ ${#NWCHEM_TARGET} -eq 0 ] ; then
+    export NWCHEM_TARGET=BGP
+  fi
+  if [ ${#ARMCI_NETWORK} -eq 0 ] ; then
+    export ARMCI_NETWORK=DCMFMPI
+  fi
+  if [ ${#MSG_COMMS} -eq 0 ] ; then
+    export MSG_COMMS=DCMFMPI
+  fi
+  if [ ${#USE_MPI} -eq 0 ] ; then
+    export USE_MPI=y
+  fi
+  if [ ${#BGCOMPILERS} -eq 0 ] ; then
+    export BGCOMPILERS=/bgsys/drivers/ppcfloor/gnu-linux/bin
+  fi
+  if [ ${#BGP_INSTALLDIR} -eq 0 ] ; then
+    export BGP_INSTALLDIR=/bgsys/drivers/ppcfloor
+  fi
+  if [ ${#BGP_RUNTIMEPATH} -eq 0 ] ; then
+    export BGP_RUNTIMEPATH=/bgsys/drivers/ppcfloor/runtime
+  fi
+  if [ ${#ARMCIDRV} -eq 0 ] ; then
+    export ARMCIDRV=${BGP_INSTALLDIR}
+  fi
+  if [ ${#BGDRIVER} -eq 0 ] ; then
+    export BGDRIVER=${ARMCIDRV}
+  fi
+  if [ ${#MPI_LIB} -eq 0 ] ; then
+    export MPI_LIB=${BGDRIVER}/comm/lib
+  fi
+  if [ ${#MPI_INCLUDE} -eq 0 ] ; then
+    export MPI_INCLUDE=${BGDRIVER}/comm/include
+  fi
+  if [ ${#BGMLMPI_INCLUDE} -eq 0 ] ; then
+    export BGMLMPI_INCLUDE=${MPI_INCLUDE}
+  fi
+  if [ ${#LIBMPI} -eq 0 ] ; then
+    export LIBMPI="-L${MPI_LIB} -lfmpich_.cnk -lmpich.cnk -ldcmf.cnk -ldcmfcoll.cnk -lpthread -lrt -L${BGP_RUNTIMEPATH}/SPI -lSPI.cna"
+  fi
+  if [ ${#MPI_F90} -eq 0 ] ; then
+    export MPI_F90=mpixlf77
+  fi
+  if [ ${#MPI_CC} -eq 0 ] ; then
+    export MPI_CC=mpixlc
+  fi
+  if [ ${#MPI_CXX} -eq 0 ] ; then
+    export MPI_CXX=mpixlcxx
+  fi
+fi
+if [ -f /bgsys/drivers/ppcfloor/comm/sys/include/pami.h ] ; then
+  #
+  # This is a BlueGene/Q machine
+  #
+  if [ ${#NWCHEM_TARGET} -eq 0 ] ; then
+    export NWCHEM_TARGET=BGQ
+  fi
+  if [ ${#ARMCI_NETWORK} -eq 0 ] ; then
+    export ARMCI_NETWORK=MPI-MT
+  fi
+  if [ ${#MSG_COMMS} -eq 0 ] ; then
+    export MSG_COMMS=MPI
+  fi
+  if [ ${#USE_MPI} -eq 0 ] ; then
+    export USE_MPI=y
+  fi
+  if [ ${#BGCOMPILERS} -eq 0 ] ; then
+    export BGCOMPILERS=/bgsys/drivers/ppcfloor/gnu-linux/bin
+  fi
+  if [ ${#BGQ_INSTALLDIR} -eq 0 ] ; then
+    export BGQ_INSTALLDIR=/bgsys/drivers/ppcfloor
+  fi
+  if [ ${#BGQ_RUNTIMEPATH} -eq 0 ] ; then
+    export BGQ_RUNTIMEPATH=/bgsys/drivers/ppcfloor/runtime
+  fi
+  if [ ${#ARMCIDRV} -eq 0 ] ; then
+    export ARMCIDRV=${BGQ_INSTALLDIR}
+  fi
+  if [ ${#BGDRIVER} -eq 0 ] ; then
+    export BGDRIVER=${ARMCIDRV}
+  fi
+  if [ ${#MPI_LIB} -eq 0 ] ; then
+    export MPI_LIB=${BGDRIVER}/comm/lib
+  fi
+  if [ ${#MPI_INCLUDE} -eq 0 ] ; then
+    export MPI_INCLUDE=${BGDRIVER}/comm/include
+  fi
+  if [ ${#BGMLMPI_INCLUDE} -eq 0 ] ; then
+    export BGMLMPI_INCLUDE=${MPI_INCLUDE}
+  fi
+  if [ ${#LIBMPI} -eq 0 ] ; then
+    export LIBMPI="-L${MPI_LIB} -lfmpich_.cnk -lmpich.cnk -ldcmf.cnk -ldcmfcoll.cnk -lpthread -lrt -L${BGQ_RUNTIMEPATH}/SPI -lSPI.cna"
+  fi
+  if [ ${#MPI_F90} -eq 0 ] ; then
+    export MPI_F90=mpixlf77_r
+  fi
+  if [ ${#MPI_CC} -eq 0 ] ; then
+    export MPI_CC=mpixlc_r
+  fi
+  if [ ${#MPI_CXX} -eq 0 ] ; then
+    export MPI_CXX=mpixlcxx_r
+  fi
+fi
+#
+# End of BlueGene stuff
+#
+if [ ${#NWCHEM_TOP} -eq 0 ] ; then
+  export NWCHEM_TOP=`pwd`
+fi
+#
+# Check for python and see what we have.
+#
+if [ ${#PYTHON_EXE} -eq 0 ] ; then
+  PYTHON_EXE=`which python`
+  if [ ${#PYTHON_EXE} -ne 0 ] ; then
+    export PYTHON_EXE
+  fi
+fi
+#
+# If we have python, find out which version we have got
+#
+if [ ${#PYTHON_EXE} -ne 0 ] ; then
+  if [ ${#PYTHONVERSION} -eq 0 ]; then
+    echo "import sys" > ./testpython$$.py
+    echo "version=sys.version_info" >> ./testpython$$.py
+    echo "print(\"%d.%d\"%(version[0],version[1]))" >> ./testpython$$.py
+    PYTHONVERSION=`${PYTHON_EXE} ./testpython$$.py`
+    export PYTHONVERSION
+    rm -f ./testpython$$.py
+  fi
+fi
+#
+# If we have python, find out which ABI we have got
+#
+if [ ${#PYTHON_EXE} -ne 0 ] ; then
+  if [ ${#PYTHONABIFLAGS} -eq 0 ]; then
+    echo "import sys" > ./testpython$$.py
+    echo "print(\"%s\"%sys.abiflags)" >> ./testpython$$.py
+    PYTHONABIFLAGS=`${PYTHON_EXE} ./testpython$$.py`
+    status=$?
+    if [ ${status} -eq 0 ] ; then
+      export PYTHONABIFLAGS
+    else
+      unset PYTHONABIFLAGS
+    fi
+    rm -f ./testpython$$.py
+  fi
+fi
+#
+# Is the python a 32 or 64 bit version?
+#
+if [ ${#PYTHON_EXE} -ne 0 ] ; then
+  echo "import struct" > ./testpython$$.py
+  echo "print(8 * struct.calcsize(\"P\"))" >> ./testpython$$.py
+  PYTHONBITS=`${PYTHON_EXE} ./testpython$$.py`
+  if [ ${PYTHONBITS} -eq 64 ] ; then
+    export USE_PYTHON64=yes
+  fi
+  rm -rf ./testpython$$.py
+fi
+if [ ${#PYTHON_EXE} -ne 0 ] ; then
+  if [ ${#PYTHONPATH} -eq 0 ] ; then
+    export PYTHONPATH=./:$NWCHEM_TOP/contrib/python/
+  fi
+fi
+#
+# Work out PYTHONHOME, i.e. where the main python libraries live
+#
+if [ ${#PYTHON_EXE} -ne 0 ] ; then
+  if [ ${#PYTHONHOME} -eq 0 ] ; then
+    TMP1=`dirname $PYTHON_EXE`
+    TMP2=`dirname $TMP1`
+    TMP1=(`find $TMP2 -name os.py -print`)
+    TMP2=`dirname ${TMP1[0]}`
+    TMP1=`dirname $TMP2`
+    export PYTHONHOME=`dirname $TMP1`
+  fi
+fi
+#
+# Work out which type of python library we have on this machine
+#
+if [ ${#PYTHON_EXE} -ne 0 ] ; then
+  if [ ${#PYTHONLIBTYPE} -eq 0 ] ; then
+    TMP1=`find ${PYTHONHOME} -name libpython${PYTHONVERSION}.a -print`
+    if [ ${#TMP1} -ne 0 ] ; then
+      export PYTHONLIBTYPE=a
+    fi
+  fi
+  if [ ${#PYTHONLIBTYPE} -eq 0 ] ; then
+    TMP1=`find ${PYTHONHOME} -name libpython${PYTHONVERSION}.so -print`
+    if [ ${#TMP1} -ne 0 ] ; then
+      export PYTHONLIBTYPE=so
+    fi
+  fi
+fi
+#
+# Set up the default MODULES selection
+#
+if [ ${#NWCHEM_MODULES} -eq 0 ] ; then
+  if [ ${#PYTHONVERSION} -eq 0 ] ; then
+    export NWCHEM_MODULES="all"
+  else
+    export NWCHEM_MODULES="all python"
+  fi
+fi
+if [ ${#LARGE_FILES} -eq 0 ] ; then
+  # Apparently LARGE_FILES is important so that the code can use files that
+  # are larger than 2GB. Also nobody has been able to give me a good reason
+  # why it should not be turned on in some cases. So I'll just hardwire it to
+  # be turned on always. Of course if it should always be turned on nowadays
+  # then why are we keeping this option?
+  export LARGE_FILES=y
+fi
+export LDOPTIONS=" "
+#export USE_SUBGROUPS=y # disables parallel diag, do not set for release
+#export DEV_GA=y        # Edo has made this a requirement...
+#export USE_GPROF=y
+#
+# Now we try and guess the network on the machine.
+# The default is MPI-MT.
+#
+if [ ${#ARMCI_NETWORK} -eq 0 ] ; then
+  #
+  # Do we have a CRAY Gemini interconnect?
+  # /opt/cray present then we are probably on a Cray machine
+  # /opt/cray/*/gemini present then we have a Gemini interconnect
+  # This is at least the situation on Hopper @ NERSC.
+  #
+  if [ -d /opt/cray ] ; then
+    GEMINIDIRS=`find /opt/cray -name ugni`
+    if [ ${#GEMINIDIRS} -ne 0 ] ; then
+      echo "This machine is a Cray with a GEMINI or ARIES interconnect"
+      echo "Please ensure you have the following modules loaded:"
+      echo "  module load ntk"
+      echo "  module load onesided"
+      echo "Module ntk provides numatoolkit.h and libnumatoolkit,"
+      echo "whereas module onesided provides onesided.h and libonesided."
+      echo "Use the following command to check which modules are loaded:"
+      echo "  module list"
+      # There seems to be a Gemini interconnect on this Cray machine
+      export ARMCI_NETWORK="DMAPP"
+      if [ ${#USE_MPI} -eq 0 ] ; then
+        export USE_MPI=y
+      fi
+      if [ ${#MPI_F90} -eq 0 ] ; then
+        export MPI_F90=ftn
+      fi
+      if [ ${#MPI_CC} -eq 0 ] ; then
+        export MPI_CC=cc
+      fi
+      if [ ${#MPI_CXX} -eq 0 ] ; then
+        export MPI_CXX=CC
+      fi
+    fi
+  fi
+fi
+if [ ${#ARMCI_NETWORK} -eq 0 ] ; then
+  #
+  # This test is stolen from GASNET
+  # /dev/ukbride present then we are probably on a Cray XT machine
+  # /proc/portals/meminfo present then this machine has Cray Portals
+  #
+  if [ -f /proc/portals/meminfo ] ; then
+    # There seems to be a portals infrastructure on this machine
+    export ARMCI_NETWORK="PORTALS"
+    if [ ${#USE_MPI} -eq 0 ] ; then
+      export USE_MPI=y
+    fi
+    if [ ${#MPI_F90} -eq 0 ] ; then
+      export MPI_F90=ftn
+    fi
+    if [ ${#MPI_CC} -eq 0 ] ; then
+      export MPI_CC=cc
+    fi
+    if [ ${#MPI_CXX} -eq 0 ] ; then
+      export MPI_CXX=CC
+    fi
+    if [ ${#MA_USE_ARMCI_MEM} -eq 0 ] ; then
+      export MA_USE_ARMCI_MEM=1
+    fi
+  fi
+fi
+if [ ${#ARMCI_NETWORK} -eq 0 ] ; then
+  if [ -d /dev/infiniband ] ; then
+    # There seems to be an infiniband network on this machine
+    export ARMCI_NETWORK="OPENIB"
+    if [ ${#USE_MPI} -eq 0 ] ; then
+      export USE_MPI=y
+    fi
+  fi
+fi
+if [ "${ARMCI_NETWORK}" == "OPENIB" ] ; then
+  if [ ${#IB_LIB} -eq 0 ]; then
+    if [ -f /usr/lib64/libibverbs.so ] ; then
+      export IB_LIB="/usr/lib64"
+    elif [ -f /usr/lib/libibverbs.so ] ; then
+      export IB_LIB="/usr/lib"
+    elif [ -f /usr/lib64/libibverbs.a ] ; then
+      export IB_LIB="/usr/lib64"
+    elif [ -f /usr/lib/libibverbs.a ] ; then
+      export IB_LIB="/usr/lib"
+    elif [ -f /usr/local/ofed/lib64/libibverbs.so ] ; then
+      export IB_LIB="/usr/local/ofed/lib64"
+    elif [ -f /usr/local/ofed/lib/libibverbs.so ] ; then
+      export IB_LIB="/usr/local/ofed/lib"
+    elif [ -f /usr/local/ofed/lib64/libibverbs.a ] ; then
+      export IB_LIB="/usr/local/ofed/lib64"
+    elif [ -f /usr/local/ofed/lib/libibverbs.a ] ; then
+      export IB_LIB="/usr/local/ofed/lib"
+    else
+      echo "ERROR: Infiniband library files not in expected location"
+      exit 1
+    fi
+  fi
+  if [ ${#IB_INCLUDE} -eq 0 ]; then
+    if [ -d /usr/include/infiniband ] ; then
+      export IB_INCLUDE="/usr/include"
+    elif [ -d /usr/local/ofed/include/infiniband ] ; then
+      export IB_INCLUDE="/usr/local/ofed/include"
+    else
+      echo "ERROR: Infiniband include files not in expected location"
+      exit 1
+    fi
+  fi
+  if [ ${#IB_LIB_NAME} -eq 0 ]; then
+    export IB_LIB_NAME="-libverbs"
+  fi
+fi
+if [ ${#SLURMOPT} -eq 0 ] ; then
+  if [ -f /usr/lib/libslurm.a ] ; then
+    export SLURMOPT="-L/usr/lib -lslurm"
+    export SLURM=y
+  elif [ -f /usr/lib64/libslurm.a ] ; then
+    export SLURMOPT="-L/usr/lib64 -lslurm"
+    export SLURM=y
+  fi
+fi
+if [ ${#NWCHEM_MPIF_WRAP} -eq 0 ] ; then
+  NWCHEM_MPIF_WRAP=`get_mpi_fortran_wrapper`
+  if [ $? -ne 0 ] ; then
+    unset NWCHEM_MPIF_WRAP
+  fi
+fi
+if [ ${#NWCHEM_MPIC_WRAP} -eq 0 ] ; then
+  NWCHEM_MPIC_WRAP=`get_mpi_c_wrapper`
+  if [ $? -ne 0 ] ; then
+    unset NWCHEM_MPIC_WRAP
+  fi
+fi
+if [ ${#NWCHEM_MPICXX_WRAP} -eq 0 ] ; then
+  NWCHEM_MPICXX_WRAP=`get_mpi_cxx_wrapper`
+  if [ $? -ne 0 ] ; then
+    unset NWCHEM_MPICXX_WRAP
+  fi
+fi
+if [ ${#OLD_GA} -eq 0 ] ; then
+  if [ ${#ARMCI_NETWORK} -eq 0 ] ; then
+    echo "#include \"stdio.h\""                                         >  ./mpi_threads$$.c
+    echo "#include \"mpi.h\""                                           >> ./mpi_threads$$.c
+    echo "int main(int argc, char **argv)"                              >> ./mpi_threads$$.c
+    echo "{"                                                            >> ./mpi_threads$$.c
+    echo "   int required = MPI_THREAD_MULTIPLE;"                       >> ./mpi_threads$$.c
+    echo "   int provided;"                                             >> ./mpi_threads$$.c
+    echo "   int result;"                                               >> ./mpi_threads$$.c
+    echo "   result = MPI_Init_thread(&argc,&argv,required,&provided);" >> ./mpi_threads$$.c
+    echo "   if (provided == MPI_THREAD_MULTIPLE) {"                    >> ./mpi_threads$$.c
+    echo "     printf(\"multithreaded\n\");"                            >> ./mpi_threads$$.c
+    echo "   } else if (provided == MPI_THREAD_SERIALIZED) {"           >> ./mpi_threads$$.c
+    echo "     printf(\"serialthreaded\n\");"                           >> ./mpi_threads$$.c
+    echo "   } else if (provided == MPI_THREAD_FUNNELED) {"             >> ./mpi_threads$$.c
+    echo "     printf(\"funnelthreaded\n\");"                           >> ./mpi_threads$$.c
+    echo "   } else if (provided == MPI_THREAD_SINGLE) {"               >> ./mpi_threads$$.c
+    echo "     printf(\"singlethreaded\n\");"                           >> ./mpi_threads$$.c
+    echo "   } else {"                                                  >> ./mpi_threads$$.c
+    echo "     result = 1;"                                             >> ./mpi_threads$$.c
+    echo "   }"                                                         >> ./mpi_threads$$.c
+    echo "   result = result || MPI_Finalize();"                        >> ./mpi_threads$$.c
+    echo "   return result;"                                            >> ./mpi_threads$$.c
+    echo "}"                                                            >> ./mpi_threads$$.c
+    if [ ${#NWCHEM_MPIC_WRAP} -ne 0 ] ; then
+      ${NWCHEM_MPIC_WRAP} -o ./mpi_threads$$.x ./mpi_threads$$.c
+      result=$?
+    else
+      result=1
+    fi
+    if [ ${result} -ne 0 ] ; then
+      # Compiling with multi-threaded support did not work, so no hope here
+      export ARMCI_NETWORK=SOCKETS
+    else
+      if [ ${#USE_MPI} -eq 0 ] ; then
+        export USE_MPI=y
+      fi
+      output=`./mpi_threads$$.x`
+      result=$?
+      if [ ${result} -ne 0 ] ; then
+        # Testing multi-threaded support did not work, so we have only two options
+        # If the experimental GA branch is being used we can use the MPI 
+        # two-sided interface at this point, otherwise our only option might be
+        # to hope for the best (essentially assuming that the sysops did not let
+        # us run the mpi_threads tests which might happen on a computer service).
+        if [ "x${EXP_GA}" != "x" ] ; then
+          # use two-sided over MPI
+          export ARMCI_NETWORK="MPI-TS"
+        else
+          # hope and pray...
+          export ARMCI_NETWORK="MPI-MT"
+        fi
+      else
+        if [ "${output}" == "multithreaded" ] ; then
+          # We have confirmed multi-threaded support!
+          export ARMCI_NETWORK="MPI-MT"
+        fi
+      fi
+    fi
+    rm -f ./mpi_threads$$.x ./mpi_threads$$.c
+  fi
+# else
+#   OLD_GA is set but GA-4-3 does not implement MPI-MT or MPI-TS
+fi
+#
+# Below we have to realize that EXPORT is a command. Hence if we use
+#   EXPORT DUMMY=`ls`
+#   status=$?
+# then status will be set to the exit code of the EXPORT command. If we
+# want the exit code from the ls command we need to write
+#   DUMMY=`ls`
+#   status=$?
+#   EXPORT DUMMY
+#
+if [ ${#MPI_INCLUDE} -eq 0 ] ; then
+  MPI_INCLUDE=`get_mpi_include`
+  if [ $? -ne 0 ] ; then
+    unset MPI_INCLUDE
+  fi
+fi
+if [ ${#MPI_LIB} -eq 0 ] ; then
+  MPI_LIB=`get_mpi_link`
+  if [ $? -ne 0 ] ; then
+    unset MPI_LIB
+  fi
+fi
+if [ ${#LIBMPI} -eq 0 ] ; then
+  LIBMPI=`get_mpi_lib`
+  if [ $? -ne 0 ] ; then
+    unset LIBMPI
+  fi
+fi
+if [ ${#MPI_F90} -eq 0 ] ; then
+  MPI_F90=`get_mpi_fortran`
+  if [ $? -ne 0 ] ; then
+    unset MPI_F90
+  fi
+fi
+if [ ${#MPI_CC} -eq 0 ] ; then
+  MPI_CC=`get_mpi_cc`
+  if [ $? -ne 0 ] ; then
+    unset MPI_CC
+  fi
+fi
+if [ ${#MPI_CXX} -eq 0 ] ; then
+  MPI_CXX=`get_mpi_cxx`
+  if [ $? -ne 0 ] ; then
+    unset MPI_CXX
+  fi
+fi
+export MPI_INCLUDE
+export MPI_LIB
+export LIBMPI
+#
+# If USE_MPI is not set at this stage do one more test to see if we have MPI.
+# If we have MPI set USE_MPI to "y" otherwise leave USE_MPI as is.
+# This is a catch all approach needed in case USE_MPI was not set but e.g.
+# ARMCI_NETWORK is. In that case ARMCI_NETWORK is not going to be detected and
+# associated USE_MPI initialization will not happen either. Therefore we need
+# to test USE_MPI separately (as opposed to conditionally on other settings).
+#
+if [ ${#USE_MPI} -eq 0 ] ; then
+  echo "#include <mpi.h>" > /tmp/$$.c
+  echo "int main(int argc, char *argv[]){" >> /tmp/$$.c
+  echo "   MPI_Init(&argc,&argv);" >> /tmp/$$.c
+  echo "   MPI_Finalize();" >> /tmp/$$.c
+  echo "}" >> /tmp/$$.c
+  ${NWCHEM_MPIC_WRAP} -o /tmp/$$.x /tmp/$$.c
+  if [ $? -eq 0 ] ; then
+    export USE_MPI=y
+  fi
+  rm -f /tmp/$$.x /tmp/$$.c
+fi
+#
+# See if the current OS is something "special"
+#
+if [ ${#NWCHEM_OS} -eq 0 ] ; then
+  NWCHEM_OS=`uname | tr '[a-z]' '[A-Z]'`
+  if [ $? -ne 0 ] ; then
+    unset NWCHEM_OS
+  fi
+  if [ ${#NWCHEM_OS} -ne 0 ] ; then
+    if [ ${NWCHEM_OS} == "DARWIN" ] ; then
+      export NWCHEM_OS=MACX
+      export BLAS_LIB=" " # At present Mac BLAS/LAPACK libraries fail for large matrices so we switch the code to use the internal implementations
+      export LAPACK_LIB=" " # At present Mac BLAS/LAPACK libraries fail for large matrices so we switch the code to use the internal implementations
+      echo "BLAS and LAPACK libraries for MACX fail for large matrices apparently."
+      echo "Hence use internal source code for these libraries."
+    elif [ ${NWCHEM_OS} == "AIX" ] ; then
+      export NWCHEM_OS=IBM
+    elif [ `expr match ${NWCHEM_OS} CYGWIN` != "0" ] ; then
+      export NWCHEM_OS=CYGWIN
+      #
+      # Now there is a 32- and a 64-bit CYGWIN version
+      #
+      #if [ ${#NWCHEM_TARGET} -eq 0 ] ; then
+      #  # There is no CYGWIN64 target so set NWCHEM_TARGET here
+      #  export NWCHEM_TARGET=${NWCHEM_OS}
+      #fi
+      # If the user did not specify any compilers and we have not been able
+      # to find them in the CYGWIN environment, then we will try and use the
+      # regular GNU compilers
+      if [ ${#MPI_F90} -eq 0 ] ; then
+        export MPI_F90=gfortran
+      fi
+      if [ ${#MPI_CC} -eq 0 ] ; then
+        export MPI_CC=gcc
+      fi
+      if [ ${#MPI_CXX} -eq 0 ] ; then
+        export MPI_CXX=gCC
+      fi
+      # I am not aware of any MPI implementations for CYGWIN so we assume to
+      # be using TCGMSG.
+      #if [ ${#MSG_COMMS} -eq 0 ] ; then
+      #  export MSG_COMMS=TCGMSG
+      #fi
+    elif [ `expr match ${NWCHEM_OS} CYGNUS` != "0" ] ; then
+      export NWCHEM_OS=CYGNUS
+      if [ ${#NWCHEM_TARGET} -eq 0 ] ; then
+        # There is no CYGNUS64 target so set NWCHEM_TARGET here
+        export NWCHEM_TARGET=${NWCHEM_OS}
+      fi
+    elif [ `expr match ${NWCHEM_OS} INTERIX` != "0" ] ; then
+      export NWCHEM_OS=INTERIX
+      if [ ${#NWCHEM_TARGET} -eq 0 ] ; then
+        # There is no INTERIX64 target so set NWCHEM_TARGET here
+        export NWCHEM_TARGET=${NWCHEM_OS}
+      fi
+    fi
+  fi
+fi
+#
+# Work out whether this is a 32- or 64-bit platform
+# We need a C-compiler to do this, hence the compiler detection comes before
+# this step. To detect the linear algebra routines we need to have worked out
+# how to build code for this platform which requires detecting the 32- vs. 64-
+# bit characteristics before attempting to detect the linear algebra routines.
+#
+if [ ${#NWCHEM_PTR_SIZE} -eq 0 ] ; then
+  NWCHEM_PTR_SIZE=`get_pointer_size ${MPI_CC}`
+  if [ $? -ne 0 ] ; then
+    unset NWCHEM_PTR_SIZE
+  fi
+fi
+if [ ${#MSG_COMMS} -eq 0 ] ; then
+  export MSG_COMMS=MPI
+fi
+if [ ${#USE_MPI} -ne 0 ] ; then
+  if [ ${#USE_MPIF} -eq 0 ] ; then
+    export USE_MPIF=y
+  fi
+  if [ ${#USE_MPIF4} -eq 0 ] ; then
+    export USE_MPIF4=y
+  fi
+fi
+if [ ${#NWCHEM_TARGET} -eq 0 ] ; then
+  if [ ${#NWCHEM_PTR_SIZE} -eq 0 ] ; then
+    echo "ERROR: could not establish pointer size needed to set NWCHEM_TARGET: aborting..."
+    exit 1
+  fi
+  if [ ${#NWCHEM_OS} -eq 0 ] ; then
+    echo "ERROR: could not establish the OS needed to set NWCHEM_TARGET: aborting..."
+    exit 1
+  fi
+  if [ ${NWCHEM_PTR_SIZE} -eq 4 ] ; then
+    export NWCHEM_TARGET=${NWCHEM_OS}
+  else
+    export NWCHEM_TARGET=${NWCHEM_OS}64
+  fi
+fi
+if [ ${#OBJECT_MODE} -eq 0 ] ; then
+  # On IBM machines we need to set what kind of executable we want, 
+  # 32 or 64 bit. The default is typically 32 bit.
+  if   [ "x${NWCHEM_TARGET}" == "xIBM" ] ; then
+    export OBJECT_MODE=32
+  elif [ "x${NWCHEM_TARGET}" == "xIBM64" ] ; then
+    export OBJECT_MODE=64
+  elif [ "x${NWCHEM_TARGET}" == "xLAPI" ] ; then
+    export OBJECT_MODE=32
+  elif [ "x${NWCHEM_TARGET}" == "xLAPI64" ] ; then
+    export OBJECT_MODE=64
+  fi
+fi
+#
+# Find out whether there are any BLAS, LAPACK and/or ScaLAPACK libraries 
+# available.
+#
+# If BLASOPT is set that runs shot over everything. 
+#
+if [ ${#BLASOPT} -ne 0 ] ; then
+  if [ ${#MPI_LIB} -ne 0 ] ; then
+    # Only set MPI_LIB_TMP if MPI_LIB is non-empty
+    MPI_LIB_TMP=`echo "-L${MPI_LIB}" | sed 's/^-L-L/-L/'`
+  fi
+  BLAS_LIB=`get_blas_lib ${MPI_F90} "${BLASOPT}" "${MPI_LIB_TMP} ${LIBMPI}"`
+  result=$?
+  if [ ${result} -eq 0 ] ; then
+    export BLAS_LIB="${BLASOPT}"
+  else 
+    # BLASOPT set but no BLAS available so use internal BLAS library
+    export BLAS_LIB=" "
+  fi
+  LAPACK_LIB=`get_lapack_lib ${MPI_F90} "${BLASOPT}" "${BLASOPT}" "${MPI_LIB_TMP} ${LIBMPI}"`
+  result=$?
+  if [ ${result} -eq 0 ] ; then
+    export LAPACK_LIB="${BLASOPT}"
+  else 
+    # BLASOPT set but no LAPACK available so use internal LAPACK library
+    export LAPACK_LIB=" "
+  fi
+  SCALAPACK_LIB=`get_scalapack_lib ${MPI_F90} "${BLASOPT}" "${BLASOPT}" "${MPI_LIB_TMP} ${LIBMPI}"`
+  result=$?
+  if [ ${result} -eq 0 ] ; then
+    export SCALAPACK_LIB="${BLASOPT}"
+  else
+    # BLASOPT set but no ScaLAPACK available so suppress ScaLAPACK library
+    export SCALAPACK_LIB=" "
+  fi
+fi
+#
+# If needed find libraries and work out which integer types they support
+#
+if [ ${#BLAS_LIB} -eq 0 ] ; then
+  if [ ${#MPI_LIB} -ne 0 ] ; then
+    # Only set MPI_LIB_TMP if MPI_LIB is non-empty
+    MPI_LIB_TMP=`echo "-L${MPI_LIB}" | sed 's/^-L-L/-L/'`
+  fi
+  BLAS_LIB=`get_blas_lib ${MPI_F90} 0 "${MPI_LIB_TMP} ${LIBMPI}"`
+  if [ ${#BLAS_LIB} -ne 0 ] ; then
+    BLAS_LIB="${MPI_LIB_TMP} ${BLAS_LIB}"
+  fi
+  export BLAS_LIB
+fi
+if [ ${#BLAS_SIZE} -eq 0 ] ; then
+  if [ ${#BLAS_LIB} -eq 0 ] ; then
+    # In this case we will build the BLAS from source
+    BLAS_SIZE=8
+  else
+    if [ ${#MPI_LIB} -ne 0 ] ; then
+      # Only set MPI_LIB_TMP if MPI_LIB is non-empty
+      MPI_LIB_TMP=`echo "-L${MPI_LIB}" | sed 's/^-L-L/-L/'`
+    fi
+    BLAS_SIZE=`get_blas_integer ${MPI_F90} "${BLAS_LIB} ${MPI_LIB_TMP} ${LIBMPI}"`
+    if [ $? -ne 0 ] ; then
+      BLAS_SIZE=8
+    fi
+  fi
+  export BLAS_SIZE
+fi
+if [ ${#LAPACK_LIB} -eq 0 ] ; then
+  if [ ${#MPI_LIB} -ne 0 ] ; then
+    # Only set MPI_LIB_TMP if MPI_LIB is non-empty
+    MPI_LIB_TMP=`echo "-L${MPI_LIB}" | sed 's/^-L-L/-L/'`
+  fi
+  LAPACK_LIB=`get_lapack_lib ${MPI_F90} "${BLAS_LIB}" 0 "${MPI_LIB_TMP} ${LIBMPI}"`
+  if [ ${#LAPACK_LIB} -ne 0 ] ; then
+    LAPACK_LIB="${MPI_LIB_TMP} ${LAPACK_LIB}"
+  fi
+  export LAPACK_LIB
+fi
+if [ ${#LAPACK_SIZE} -eq 0 ] ; then
+  if [ ${#LAPACK_LIB} -eq 0 ] ; then
+    # In this case we will build the LAPACK from source
+    LAPACK_SIZE=8
+  else
+    if [ ${#MPI_LIB} -ne 0 ] ; then
+      # Only set MPI_LIB_TMP if MPI_LIB is non-empty
+      MPI_LIB_TMP=`echo "-L${MPI_LIB}" | sed 's/^-L-L/-L/'`
+    fi
+    LAPACK_SIZE=`get_lapack_integer ${MPI_F90} "${LAPACK_LIB} ${BLAS_LIB} ${MPI_LIB_TMP} ${LIBMPI}"`
+    if [ $? -ne 0 ] ; then
+      LAPACK_SIZE=8
+    fi
+  fi
+  export LAPACK_SIZE
+fi
+if [ ${#SCALAPACK_LIB} -eq 0 ] ; then
+  if [ ${#MPI_LIB} -ne 0 ] ; then
+    # Only set MPI_LIB_TMP if MPI_LIB is non-empty
+    MPI_LIB_TMP=`echo "-L${MPI_LIB}" | sed 's/^-L-L/-L/'`
+  fi
+  SCALAPACK_LIB=`get_scalapack_lib ${MPI_F90} "${LAPACK_LIB} ${BLAS_LIB}" 0 "${MPI_LIB_TMP} ${LIBMPI}"`
+  if [ ${#SCALAPACK_LIB} -ne 0 ] ; then
+    SCALAPACK_LIB="${MPI_LIB_TMP} ${SCALAPACK_LIB}"
+  fi
+  export SCALAPACK_LIB
+fi
+if [ ${#SCALAPACK_SIZE} -eq 0 ] ; then
+  if [ ${#SCALAPACK_LIB} -eq 0 ] ; then
+    # In this case there is no ScaLAPACK
+    SCALAPACK_SIZE=0
+  else
+    if [ ${#MPI_LIB} -ne 0 ] ; then
+      # Only set MPI_LIB_TMP if MPI_LIB is non-empty
+      MPI_LIB_TMP=`echo "-L${MPI_LIB}" | sed 's/^-L-L/-L/'`
+    fi
+    SCALAPACK_SIZE=`get_scalapack_integer ${MPI_F90} "${SCALAPACK_LIB} ${LAPACK_LIB} ${BLAS_LIB} ${MPI_LIB_TMP} ${LIBMPI}"`
+  fi
+  export SCALAPACK_SIZE
+fi
+#
+# Check whether we can use long pathnames (needs ISO_C_BINDING)
+#
+if [ ${#NWCHEM_LONG_PATHS} -eq 0 ] ; then
+   ISO_C=`fortran_has_iso_c_binding ${MPI_F90}`
+   if [ "x${ISO_C}" == "xY" ] ; then
+      export NWCHEM_LONG_PATHS=Y
+   fi
+fi
+#
+# Check whether this machine supports GPUs
+#
+if [ ${#TCE_CUDA} -ne 0 ] ; then
+  if [ ${#CUDA} -eq 0 ] ; then
+     CUDA=`which nvcc`
+     if [ ${#CUDA} -ne 0 ] ; then
+       export CUDA
+     else
+       unset CUDA
+     fi
+  fi
+  if [ ${#CUDA} -ne 0 ] ; then
+     CUDA_PATH="`dirname ${CUDA}`"
+     CUDA_PATH="`dirname ${CUDA_PATH}`"
+     if [ ${#CUDA_INCLUDE} -eq 0 ] ; then
+       export CUDA_INCLUDE="-I${CUDA_PATH}/include"
+     fi
+     if [ ${#CUDA_LIBS} -eq 0 ] ; then
+       if [ ${NWCHEM_PTR_SIZE} -eq 4 ] ; then
+         export CUDA_LIBS="-L${CUDA_PATH}/lib -lcudart"
+       elif [ ${NWCHEM_PTR_SIZE} -eq 8 ] ; then
+         export CUDA_LIBS="-L${CUDA_PATH}/lib64 -lcudart"
+       else
+         echo "NWCHEM_PTR_SIZE unknown; cannot set CUDA_LIBS; aborting..."
+         exit 100
+       fi
+     fi
+     unset CUDA_PATH
+  fi
+  # There is also a variable CUDA_FLAGS but I have no idea what that should be.
+fi
+#
+# Work out whether BLAS, LAPACK and SCALAPACK are compatible and based on that
+# what we are actually going to use.
+#
+echo "=== Initial guesses for linear algebra libraries ==="
+echo "BLAS      = " ${BLAS_LIB} " integer-size = " ${BLAS_SIZE}
+echo "LAPACK    = " ${LAPACK_LIB} " integer-size = " ${LAPACK_SIZE}
+echo "SCALAPACK = " ${SCALAPACK_LIB} " integer-size = " ${SCALAPACK_SIZE}
+echo "=== Working out how to proceed ====================="
+if [[ ( ${#SCALAPACK_LIB} -eq 0 ) || ( ${SCALAPACK_LIB} == " ") ]] ; then
+  # No ScaLAPACK found so worry only about BLAS and LAPACK
+  echo "No ScaLAPACK found, so no ScaLAPACK will be used"
+  if [ ${LAPACK_SIZE} -ne ${BLAS_SIZE} ] ; then
+    # So at least one of LAPACK and BLAS has to fall back to source code
+    # and integer*8.
+    echo "BLAS and LAPACK integer sizes do not match, dropping the integer size 4 library"
+    if [[ ( ${BLAS_SIZE} -eq 4 ) || ( ${BLAS_SIZE} -eq 0 ) ]] ; then
+      export BLAS_LIB=""
+      export BLAS_SIZE=8
+    fi
+    if [[ ( ${LAPACK_SIZE} -eq 4 ) || ( ${LAPACK_SIZE} -eq 0 ) ]] ; then
+      export LAPACK_LIB=""
+      export LAPACK_SIZE=8
+    fi
+  else
+    echo "BLAS and LAPACK are OK"
+  fi
+else
+  if [[ ( ${LAPACK_SIZE} -ne ${BLAS_SIZE} ) || ( ${SCALAPACK_SIZE} -ne ${BLAS_SIZE} ) ]] ; then
+    echo "BLAS, LAPACK and ScaLAPACK integer sizes do not match, dropping the integer size 4 libraries"
+    if [[ ( ${BLAS_SIZE} -eq 4 ) || ( ${BLAS_SIZE} -eq 0 ) ]] ; then
+      export BLAS_LIB=""
+      export BLAS_SIZE=8
+    fi
+    if [[ ( ${LAPACK_SIZE} -eq 4 ) || ( ${LAPACK_SIZE} -eq 0 ) ]] ; then
+      export LAPACK_LIB=""
+      export LAPACK_SIZE=8
+    fi
+    if [[ ( ${SCALAPACK_SIZE} -eq 4 ) || ( ${SCALAPACK_SIZE} -eq 0 ) ]] ; then
+      export SCALAPACK_LIB=""
+      export SCALAPACK_SIZE=8
+    fi
+  else
+    echo "BLAS, LAPACK and ScaLAPACK are OK"
+  fi
+fi
+if [ "${BLAS_LIB}" == " " ] ; then
+  export BLAS_LIB=""
+fi
+if [ "${LAPACK_LIB}" == " " ] ; then
+  export LAPACK_LIB=""
+fi
+if [ "${SCALAPACK_LIB}" == " " ] ; then
+  export SCALAPACK_LIB=""
+fi
+if [ ${#SCALAPACK_LIB} -ne 0 ] ; then
+  export USE_SCALAPACK=y
+fi
+if [ ${#NWCHEM_EXECUTABLE} -eq 0 ] ; then
+  export NWCHEM_EXECUTABLE=$NWCHEM_TOP/bin/$NWCHEM_TARGET/nwchem
+fi
+echo "==============="
+echo "Building NWChem"
+echo "==============="
+echo
+if [ -f nwchem_make_env.sh ]   && [ -f nwchem_make_env.csh ] && \
+   [ -f nwchem_make_unenv.sh ] && [ -f nwchem_make_unenv.csh ] ; then
+  if [ -w nwchem_make_env.sh ]   && [ -w nwchem_make_env.csh ] && \
+     [ -w nwchem_make_unenv.sh ] && [ -w nwchem_make_unenv.csh ] ; then
+    export NWCHEM_MAKE_WRITE="yes"
+  fi
+else
+  export NWCHEM_MAKE_WRITE="yes"
+fi
+if [ ${#NWCHEM_MAKE_WRITE} -ne 0 ]; then
+  export NWCHEM_ENV_SH=${NWCHEM_TOP}/nwchem_make_env.sh
+  export NWCHEM_ENV_CSH=${NWCHEM_TOP}/nwchem_make_env.csh
+  export NWCHEM_UNENV_SH=${NWCHEM_TOP}/nwchem_make_unenv.sh
+  export NWCHEM_UNENV_CSH=${NWCHEM_TOP}/nwchem_make_unenv.csh
+else
+  export NWCHEM_ENV_SH=/dev/null
+  export NWCHEM_ENV_CSH=/dev/null
+  export NWCHEM_UNENV_SH=/dev/null
+  export NWCHEM_UNENV_CSH=/dev/null
+fi
+echo "# This file was auto-generated by ${NWCHEM_TOP}/contrib/distro-tools/build_nwchem" > ${NWCHEM_ENV_SH}
+echo "# This file was auto-generated by ${NWCHEM_TOP}/contrib/distro-tools/build_nwchem" > ${NWCHEM_ENV_CSH}
+echo "# This file was auto-generated by ${NWCHEM_TOP}/contrib/distro-tools/build_nwchem" > ${NWCHEM_UNENV_SH}
+echo "# This file was auto-generated by ${NWCHEM_TOP}/contrib/distro-tools/build_nwchem" > ${NWCHEM_UNENV_CSH}
+#
+echo "NWCHEM_TOP         =" ${NWCHEM_TOP}
+echo "export NWCHEM_TOP=${NWCHEM_TOP}" >> ${NWCHEM_ENV_SH}
+echo "setenv NWCHEM_TOP ${NWCHEM_TOP}" >> ${NWCHEM_ENV_CSH}
+echo "unset NWCHEM_TOP"                >> ${NWCHEM_UNENV_SH}
+echo "unsetenv NWCHEM_TOP"             >> ${NWCHEM_UNENV_CSH}
+#
+echo "NWCHEM_TARGET      =" ${NWCHEM_TARGET}
+echo "export NWCHEM_TARGET=${NWCHEM_TARGET}" >> ${NWCHEM_ENV_SH}
+echo "setenv NWCHEM_TARGET ${NWCHEM_TARGET}" >> ${NWCHEM_ENV_CSH}
+echo "unset NWCHEM_TARGET"                   >> ${NWCHEM_UNENV_SH}
+echo "unsetenv NWCHEM_TARGET"                >> ${NWCHEM_UNENV_CSH}
+#
+echo "NWCHEM_MODULES     =" ${NWCHEM_MODULES}
+echo "export NWCHEM_MODULES=\"${NWCHEM_MODULES}\"" >> ${NWCHEM_ENV_SH}
+echo "setenv NWCHEM_MODULES \"${NWCHEM_MODULES}\"" >> ${NWCHEM_ENV_CSH}
+echo "unset NWCHEM_MODULES"                        >> ${NWCHEM_UNENV_SH}
+echo "unsetenv NWCHEM_MODULES"                     >> ${NWCHEM_UNENV_CSH}
+#
+if [ ${#NWCHEM_MPIF_WRAP} -ne 0 ] ; then
+  echo "NWCHEM_MPIF_WRAP   =" ${NWCHEM_MPIF_WRAP}
+  echo "export NWCHEM_MPIF_WRAP=\"${NWCHEM_MPIF_WRAP}\"" >> ${NWCHEM_ENV_SH}
+  echo "setenv NWCHEM_MPIF_WRAP \"${NWCHEM_MPIF_WRAP}\"" >> ${NWCHEM_ENV_CSH}
+  echo "unset NWCHEM_MPIF_WRAP"                          >> ${NWCHEM_UNENV_SH}
+  echo "unsetenv NWCHEM_MPIF_WRAP"                       >> ${NWCHEM_UNENV_CSH}
+fi
+if [ ${#NWCHEM_MPIC_WRAP} -ne 0 ] ; then
+  echo "NWCHEM_MPIC_WRAP   =" ${NWCHEM_MPIC_WRAP}
+  echo "export NWCHEM_MPIC_WRAP=\"${NWCHEM_MPIC_WRAP}\"" >> ${NWCHEM_ENV_SH}
+  echo "setenv NWCHEM_MPIC_WRAP \"${NWCHEM_MPIC_WRAP}\"" >> ${NWCHEM_ENV_CSH}
+  echo "unset NWCHEM_MPIC_WRAP"                          >> ${NWCHEM_UNENV_SH}
+  echo "unsetenv NWCHEM_MPIC_WRAP"                       >> ${NWCHEM_UNENV_CSH}
+fi
+if [ ${#NWCHEM_MPICXX_WRAP} -ne 0 ] ; then
+  echo "NWCHEM_MPICXX_WRAP =" ${NWCHEM_MPICXX_WRAP}
+  echo "export NWCHEM_MPICXX_WRAP=\"${NWCHEM_MPICXX_WRAP}\"" >> ${NWCHEM_ENV_SH}
+  echo "setenv NWCHEM_MPICXX_WRAP \"${NWCHEM_MPICXX_WRAP}\"" >> ${NWCHEM_ENV_CSH}
+  echo "unset NWCHEM_MPICXX_WRAP"                            >> ${NWCHEM_UNENV_SH}
+  echo "unsetenv NWCHEM_MPICXX_WRAP"                         >> ${NWCHEM_UNENV_CSH}
+fi
+if [ ${#NWCHEM_LONG_PATHS} -ne 0 ] ; then
+  echo "NWCHEM_LONG_PATHS  =" ${NWCHEM_LONG_PATHS}
+  echo "export NWCHEM_LONG_PATHS=${NWCHEM_LONG_PATHS}" >> ${NWCHEM_ENV_SH}
+  echo "setenv NWCHEM_LONG_PATHS ${NWCHEM_LONG_PATHS}" >> ${NWCHEM_ENV_CSH}
+  echo "unset NWCHEM_LONG_PATHS"                       >> ${NWCHEM_UNENV_SH}
+  echo "unsetenv NWCHEM_LONG_PATHS"                    >> ${NWCHEM_UNENV_CSH}
+fi
+if [ ${#NWCHEM_FSCHECK} -ne 0 ] ; then
+  echo "NWCHEM_FSCHECK     =" ${NWCHEM_FSCHECK}
+  echo "export NWCHEM_FSCHECK=${NWCHEM_FSCHECK}" >> ${NWCHEM_ENV_SH}
+  echo "setenv NWCHEM_FSCHECK ${NWCHEM_FSCHECK}" >> ${NWCHEM_ENV_CSH}
+  echo "unset NWCHEM_FSCHECK"                    >> ${NWCHEM_UNENV_SH}
+  echo "unsetenv NWCHEM_FSCHECK"                 >> ${NWCHEM_UNENV_CSH}
+fi
+if [ ${#USE_NOFSCHECK} -ne 0 ] ; then
+  echo "USE_NOFSCHECK      =" ${USE_NOFSCHECK}
+  echo "export USE_NOFSCHECK=${USE_NOFSCHECK}" >> ${NWCHEM_ENV_SH}
+  echo "setenv USE_NOFSCHECK ${USE_NOFSCHECK}" >> ${NWCHEM_ENV_CSH}
+  echo "unset USE_NOFSCHECK"                   >> ${NWCHEM_UNENV_SH}
+  echo "unsetenv USE_NOFSCHECK"                >> ${NWCHEM_UNENV_CSH}
+fi
+if [ ${#OBJECT_MODE} -ne 0 ] ; then
+  echo "OBJECT_MODE        =" ${OBJECT_MODE}
+  echo "export OBJECT_MODE=${OBJECT_MODE}" >> ${NWCHEM_ENV_SH}
+  echo "setenv OBJECT_MODE ${OBJECT_MODE}" >> ${NWCHEM_ENV_CSH}
+  echo "unset OBJECT_MODE"                 >> ${NWCHEM_UNENV_SH}
+  echo "unsetenv OBJECT_MODE"              >> ${NWCHEM_UNENV_CSH}
+fi
+echo "USE_MPI            =" ${USE_MPI}
+echo "export USE_MPI=${USE_MPI}" >> ${NWCHEM_ENV_SH}
+echo "setenv USE_MPI ${USE_MPI}" >> ${NWCHEM_ENV_CSH}
+echo "unset USE_MPI"             >> ${NWCHEM_UNENV_SH}
+echo "unsetenv USE_MPI"          >> ${NWCHEM_UNENV_CSH}
+if [ ${#USE_MPIF} -ne 0 ] ; then
+  echo "USE_MPIF           =" ${USE_MPIF}
+  echo "export USE_MPIF=${USE_MPIF}" >> ${NWCHEM_ENV_SH}
+  echo "setenv USE_MPIF ${USE_MPIF}" >> ${NWCHEM_ENV_CSH}
+  echo "unset USE_MPIF"              >> ${NWCHEM_UNENV_SH}
+  echo "unsetenv USE_MPIF"           >> ${NWCHEM_UNENV_CSH}
+fi
+if [ ${#USE_MPIF4} -ne 0 ] ; then
+  echo "USE_MPIF4          =" ${USE_MPIF4}
+  echo "export USE_MPIF4=${USE_MPIF4}" >> ${NWCHEM_ENV_SH}
+  echo "setenv USE_MPIF4 ${USE_MPIF4}" >> ${NWCHEM_ENV_CSH}
+  echo "unset USE_MPIF4"               >> ${NWCHEM_UNENV_SH}
+  echo "unsetenv USE_MPIF4"            >> ${NWCHEM_UNENV_CSH}
+fi
+echo "MPI_INCLUDE        =" ${MPI_INCLUDE}
+echo "export MPI_INCLUDE=\"${MPI_INCLUDE}\"" >> ${NWCHEM_ENV_SH}
+echo "setenv MPI_INCLUDE \"${MPI_INCLUDE}\"" >> ${NWCHEM_ENV_CSH}
+echo "unset MPI_INCLUDE"                     >> ${NWCHEM_UNENV_SH}
+echo "unsetenv MPI_INCLUDE"                  >> ${NWCHEM_UNENV_CSH}
+#
+echo "MPI_LIB            =" ${MPI_LIB}
+echo "export MPI_LIB=\"${MPI_LIB}\"" >> ${NWCHEM_ENV_SH}
+echo "setenv MPI_LIB \"${MPI_LIB}\"" >> ${NWCHEM_ENV_CSH}
+echo "unset MPI_LIB"                 >> ${NWCHEM_UNENV_SH}
+echo "unsetenv MPI_LIB"              >> ${NWCHEM_UNENV_CSH}
+#
+echo "LIBMPI             =" ${LIBMPI}
+echo "export LIBMPI=\"${LIBMPI}\"" >> ${NWCHEM_ENV_SH}
+echo "setenv LIBMPI \"${LIBMPI}\"" >> ${NWCHEM_ENV_CSH}
+echo "unset LIBMPI"                >> ${NWCHEM_UNENV_SH}
+echo "unsetenv LIBMPI"             >> ${NWCHEM_UNENV_CSH}
+#
+echo "MPI_F90            =" ${MPI_F90}
+echo "export FC=${MPI_F90}" >> ${NWCHEM_ENV_SH}
+echo "setenv FC ${MPI_F90}" >> ${NWCHEM_ENV_CSH}
+echo "unset FC"             >> ${NWCHEM_UNENV_SH}
+echo "unsetenv FC"          >> ${NWCHEM_UNENV_CSH}
+#
+echo "MPI_CC             =" ${MPI_CC}
+echo "export CC=${MPI_CC}" >> ${NWCHEM_ENV_SH}
+echo "setenv CC ${MPI_CC}" >> ${NWCHEM_ENV_CSH}
+echo "unset CC"            >> ${NWCHEM_UNENV_SH}
+echo "unsetenv CC"         >> ${NWCHEM_UNENV_CSH}
+#
+echo "MPI_CXX            =" ${MPI_CXX}
+echo "export CXX=${MPI_CXX}" >> ${NWCHEM_ENV_SH}
+echo "setenv CXX ${MPI_CXX}" >> ${NWCHEM_ENV_CSH}
+echo "unset CXX"             >> ${NWCHEM_UNENV_SH}
+echo "unsetenv CXX"          >> ${NWCHEM_UNENV_CSH}
+#
+echo "ARMCI_NETWORK      =" ${ARMCI_NETWORK}
+echo "export ARMCI_NETWORK=${ARMCI_NETWORK}" >> ${NWCHEM_ENV_SH}
+echo "setenv ARMCI_NETWORK ${ARMCI_NETWORK}" >> ${NWCHEM_ENV_CSH}
+echo "unset ARMCI_NETWORK"                   >> ${NWCHEM_UNENV_SH}
+echo "unsetenv ARMCI_NETWORK"                >> ${NWCHEM_UNENV_CSH}
+#
+echo "MSG_COMMS          =" ${MSG_COMMS}
+echo "export MSG_COMMS=${MSG_COMMS}" >> ${NWCHEM_ENV_SH}
+echo "setenv MSG_COMMS ${MSG_COMMS}" >> ${NWCHEM_ENV_CSH}
+echo "unset MSG_COMMS"               >> ${NWCHEM_UNENV_SH}
+echo "unsetenv MSG_COMMS"            >> ${NWCHEM_UNENV_CSH}
+#
+if [ ${#IB_INCLUDE} -ne 0 ] ; then
+  echo "IB_INCLUDE         =" ${IB_INCLUDE}
+  echo "export IB_INCLUDE=\"${IB_INCLUDE}\"" >> ${NWCHEM_ENV_SH}
+  echo "setenv IB_INCLUDE \"${IB_INCLUDE}\"" >> ${NWCHEM_ENV_CSH}
+  echo "unset IB_INCLUDE"                    >> ${NWCHEM_UNENV_SH}
+  echo "unsetenv IB_INCLUDE"                 >> ${NWCHEM_UNENV_CSH}
+fi
+if [ ${#IB_LIB} -ne 0 ] ; then
+  echo "IB_LIB             =" ${IB_LIB}
+  echo "export IB_LIB=\"${IB_LIB}\"" >> ${NWCHEM_ENV_SH}
+  echo "setenv IB_LIB \"${IB_LIB}\"" >> ${NWCHEM_ENV_CSH}
+  echo "unset IB_LIB"                >> ${NWCHEM_UNENV_SH}
+  echo "unsetenv IB_LIB"             >> ${NWCHEM_UNENV_CSH}
+fi
+if [ ${#IB_LIB_NAME} -ne 0 ] ; then
+  echo "IB_LIB_NAME        =" ${IB_LIB_NAME}
+  echo "export IB_LIB_NAME=\"${IB_LIB_NAME}\"" >> ${NWCHEM_ENV_SH}
+  echo "setenv IB_LIB_NAME \"${IB_LIB_NAME}\"" >> ${NWCHEM_ENV_CSH}
+  echo "unset IB_LIB_NAME"                     >> ${NWCHEM_UNENV_SH}
+  echo "unsetenv IB_LIB_NAME"                  >> ${NWCHEM_UNENV_CSH}
+fi
+if [ ${#SLURMOPT} -ne 0 ] ; then
+  echo "SLURMOPT           =" ${SLURMOPT}
+  echo "SLURM              =" ${SLURM}
+  echo "export SLURMOPT=\"${SLURMOPT}\"" >> ${NWCHEM_ENV_SH}
+  echo "export SLURM=${SLURM}"           >> ${NWCHEM_ENV_SH}
+  echo "setenv SLURMOPT \"${SLURMOPT}\"" >> ${NWCHEM_ENV_CSH}
+  echo "setenv SLURM ${SLURM}"           >> ${NWCHEM_ENV_CSH}
+  echo "unset SLURMOPT"                  >> ${NWCHEM_UNENV_SH}
+  echo "unset SLURM"                     >> ${NWCHEM_UNENV_SH}
+  echo "unsetenv SLURMOPT"               >> ${NWCHEM_UNENV_CSH}
+  echo "unsetenv SLURM"                  >> ${NWCHEM_UNENV_CSH}
+fi
+if [ ${#BLASOPT} -ne 0 ] ; then
+  echo "BLASOPT            =" ${BLASOPT} 
+  echo "export BLASOPT=\"${BLASOPT}\"" >> ${NWCHEM_ENV_SH}
+  echo "setenv BLASOPT \"${BLASOPT}\"" >> ${NWCHEM_ENV_CSH}
+  echo "unset BLASOPT"                 >> ${NWCHEM_UNENV_SH}
+  echo "unsetenv BLASOPT"              >> ${NWCHEM_UNENV_CSH}
+fi
+if [ ${#BLAS_LIB} -ne 0 ] ; then
+  echo "BLAS_LIB           =" ${BLAS_LIB} " integer-size = " ${BLAS_SIZE}
+  echo "export BLAS_SIZE=${BLAS_SIZE}"   >> ${NWCHEM_ENV_SH}
+  echo "setenv BLAS_SIZE ${BLAS_SIZE}"   >> ${NWCHEM_ENV_CSH}
+  echo "unset BLAS_SIZE"                 >> ${NWCHEM_UNENV_SH}
+  echo "unsetenv BLAS_SIZE"              >> ${NWCHEM_UNENV_CSH}
+  echo "export BLAS_LIB=\"${BLAS_LIB}\"" >> ${NWCHEM_ENV_SH}
+  echo "setenv BLAS_LIB \"${BLAS_LIB}\"" >> ${NWCHEM_ENV_CSH}
+  echo "unset BLAS_LIB"                  >> ${NWCHEM_UNENV_SH}
+  echo "unsetenv BLAS_LIB"               >> ${NWCHEM_UNENV_CSH}
+fi
+if [ ${#LAPACK_LIB} -ne 0 ] ; then
+  echo "LAPACK_LIB         =" ${LAPACK_LIB} " integer-size = " ${LAPACK_SIZE}
+  echo "export LAPACK_SIZE=${LAPACK_SIZE}"   >> ${NWCHEM_ENV_SH}
+  echo "setenv LAPACK_SIZE ${LAPACK_SIZE}"   >> ${NWCHEM_ENV_CSH}
+  echo "unset LAPACK_SIZE"                   >> ${NWCHEM_UNENV_SH}
+  echo "unsetenv LAPACK_SIZE"                >> ${NWCHEM_UNENV_CSH}
+  echo "export LAPACK_LIB=\"${LAPACK_LIB}\"" >> ${NWCHEM_ENV_SH}
+  echo "setenv LAPACK_LIB \"${LAPACK_LIB}\"" >> ${NWCHEM_ENV_CSH}
+  echo "unset LAPACK_LIB"                    >> ${NWCHEM_UNENV_SH}
+  echo "unsetenv LAPACK_LIB"                 >> ${NWCHEM_UNENV_CSH}
+fi
+if [ ${#SCALAPACK_LIB} -ne 0 ] ; then
+  echo "SCALAPACK_LIB      =" ${SCALAPACK_LIB} " integer-size = " ${SCALAPACK_SIZE}
+  echo "export SCALAPACK_SIZE=${SCALAPACK_SIZE}"   >> ${NWCHEM_ENV_SH}
+  echo "setenv SCALAPACK_SIZE ${SCALAPACK_SIZE}"   >> ${NWCHEM_ENV_CSH}
+  echo "unset SCALAPACK_SIZE"                      >> ${NWCHEM_UNENV_SH}
+  echo "unsetenv SCALAPACK_SIZE"                   >> ${NWCHEM_UNENV_CSH}
+  echo "export SCALAPACK_LIB=\"${SCALAPACK_LIB}\"" >> ${NWCHEM_ENV_SH}
+  echo "setenv SCALAPACK_LIB \"${SCALAPACK_LIB}\"" >> ${NWCHEM_ENV_CSH}
+  echo "unset SCALAPACK_LIB"                       >> ${NWCHEM_UNENV_SH}
+  echo "unsetenv SCALAPACK_LIB"                    >> ${NWCHEM_UNENV_CSH}
+fi
+if [ ${#CUDA} -ne 0 ] ; then
+  echo "CUDA               =" ${CUDA}
+  echo "export CUDA=${CUDA}" >> ${NWCHEM_ENV_SH}
+  echo "setenv CUDA ${CUDA}" >> ${NWCHEM_ENV_CSH}
+  echo "unset CUDA"          >> ${NWCHEM_UNENV_SH}
+  echo "unsetenv CUDA"       >> ${NWCHEM_UNENV_CSH}
+fi
+if [ ${#CUDA_INCLUDE} -ne 0 ] ; then
+  echo "CUDA_INCLUDE       =" ${CUDA_INCLUDE}
+  echo "export CUDA_INCLUDE=\"${CUDA_INCLUDE}\"" >> ${NWCHEM_ENV_SH}
+  echo "setenv CUDA_INCLUDE \"${CUDA_INCLUDE}\"" >> ${NWCHEM_ENV_CSH}
+  echo "unset CUDA_INCLUDE"                      >> ${NWCHEM_UNENV_SH}
+  echo "unsetenv CUDA_INCLUDE"                   >> ${NWCHEM_UNENV_CSH}
+fi
+if [ ${#CUDA_LIBS} -ne 0 ] ; then
+  echo "CUDA_LIBS          =" ${CUDA_LIBS}
+  echo "export CUDA_LIBS=\"${CUDA_LIBS}\"" >> ${NWCHEM_ENV_SH}
+  echo "setenv CUDA_LIBS \"${CUDA_LIBS}\"" >> ${NWCHEM_ENV_CSH}
+  echo "unset CUDA_LIBS"                   >> ${NWCHEM_UNENV_SH}
+  echo "unsetenv CUDA_LIBS"                >> ${NWCHEM_UNENV_CSH}
+fi
+if [ ${#MRCC_METHODS} -ne 0 ] ; then
+  echo "MRCC_METHODS       =" ${MRCC_METHODS}
+  echo "export MRCC_METHODS=${MRCC_METHODS}" >> ${NWCHEM_ENV_SH}
+  echo "setenv MRCC_METHODS ${MRCC_METHODS}" >> ${NWCHEM_ENV_CSH}
+  echo "unset MRCC_METHODS"                  >> ${NWCHEM_UNENV_SH}
+  echo "unsetenv MRCC_METHODS"               >> ${NWCHEM_UNENV_CSH}
+fi
+if [ ${#PYTHON_EXE} -ne 0 ] ; then
+  echo "PYTHON_EXE         =" ${PYTHON_EXE}
+  echo "export PYTHON_EXE=${PYTHON_EXE}" >> ${NWCHEM_ENV_SH}
+  echo "setenv PYTHON_EXE ${PYTHON_EXE}" >> ${NWCHEM_ENV_CSH}
+  echo "unset PYTHON_EXE"                >> ${NWCHEM_UNENV_SH}
+  echo "unsetenv PYTHON_EXE"             >> ${NWCHEM_UNENV_CSH}
+fi
+if [ ${#PYTHONVERSION} -ne 0 ] ; then
+  echo "PYTHONVERSION      =" ${PYTHONVERSION}
+  echo "export PYTHONVERSION=${PYTHONVERSION}" >> ${NWCHEM_ENV_SH}
+  echo "setenv PYTHONVERSION ${PYTHONVERSION}" >> ${NWCHEM_ENV_CSH}
+  echo "unset PYTHONVERSION"                   >> ${NWCHEM_UNENV_SH}
+  echo "unsetenv PYTHONVERSION"                >> ${NWCHEM_UNENV_CSH}
+fi
+if [ ${#PYTHONABIFLAGS} -ne 0 ] ; then
+  echo "PYTHONABIFLAGS     =" ${PYTHONABIFLAGS}
+  echo "export PYTHONABIFLAGS=${PYTHONABIFLAGS}" >> ${NWCHEM_ENV_SH}
+  echo "setenv PYTHONABIFLAGS ${PYTHONABIFLAGS}" >> ${NWCHEM_ENV_CSH}
+  echo "unset PYTHONABIFLAGS"                    >> ${NWCHEM_UNENV_SH}
+  echo "unsetenv PYTHONABIFLAGS"                 >> ${NWCHEM_UNENV_CSH}
+fi
+if [ ${#USE_PYTHON64} -ne 0 ] ; then
+  echo "USE_PYTHON64       =" ${USE_PYTHON64}
+  echo "export USE_PYTHON64=${USE_PYTHON64}" >> ${NWCHEM_ENV_SH}
+  echo "setenv USE_PYTHON64 ${USE_PYTHON64}" >> ${NWCHEM_ENV_CSH}
+  echo "unset USE_PYTHON64"                  >> ${NWCHEM_UNENV_SH}
+  echo "unsetenv USE_PYTHON64"               >> ${NWCHEM_UNENV_CSH}
+fi
+if [ ${#PYTHONPATH} -ne 0 ] ; then
+  echo "PYTHONPATH         =" ${PYTHONPATH}
+  echo "export PYTHONPATH=${PYTHONPATH}" >> ${NWCHEM_ENV_SH}
+  echo "setenv PYTHONPATH ${PYTHONPATH}" >> ${NWCHEM_ENV_CSH}
+  echo "unset PYTHONPATH"                >> ${NWCHEM_UNENV_SH}
+  echo "unsetenv PYTHONPATH"             >> ${NWCHEM_UNENV_CSH}
+fi
+if [ ${#PYTHONHOME} -ne 0 ] ; then
+  echo "PYTHONHOME         =" ${PYTHONHOME}
+  echo "export PYTHONHOME=${PYTHONHOME}" >> ${NWCHEM_ENV_SH}
+  echo "setenv PYTHONHOME ${PYTHONHOME}" >> ${NWCHEM_ENV_CSH}
+  echo "unset PYTHONHOME"                >> ${NWCHEM_UNENV_SH}
+  echo "unsetenv PYTHONHOME"             >> ${NWCHEM_UNENV_CSH}
+fi
+if [ ${#PYTHONLIBTYPE} -ne 0 ] ; then
+  echo "PYTHONLIBTYPE      =" ${PYTHONLIBTYPE}
+  echo "export PYTHONLIBTYPE=${PYTHONLIBTYPE}" >> ${NWCHEM_ENV_SH}
+  echo "setenv PYTHONLIBTYPE ${PYTHONLIBTYPE}" >> ${NWCHEM_ENV_CSH}
+  echo "unset PYTHONLIBTYPE"                   >> ${NWCHEM_UNENV_SH}
+  echo "unsetenv PYTHONLIBTYPE"                >> ${NWCHEM_UNENV_CSH}
+fi
+echo "function renwc()" >> ${NWCHEM_ENV_SH}
+echo "{"                                                                   >> ${NWCHEM_ENV_SH}
+echo "   make FC=\$FC ; pushd \$NWCHEM_TOP/src ; make FC=\$FC link ; popd" >> ${NWCHEM_ENV_SH}
+echo "}"                                                                   >> ${NWCHEM_ENV_SH}
+echo "alias renwc 'make FC=\$FC ; pushd \$NWCHEM_TOP/src ; make FC=\$FC link ; popd'" >> ${NWCHEM_ENV_CSH}
+#
+# The USE_64TO32 environment variable is special and is dealt with below.
+#
+#
+# Stop if we find essential information missing.
+# I.e. no Fortran, C, or C++ compilers or settings to use obsolete versions
+# of GA.
+#
+if [ ${#MPI_F90} -eq 0 ] ; then
+  echo "ERROR: No Fortran compiler found: aborting..." > /dev/stderr
+  exit 1
+fi
+if [ ${#MPI_CC} -eq 0 ] ; then
+  echo "ERROR: No C compiler found: aborting..." > /dev/stderr
+  exit 1
+fi
+if [ ${#MPI_CXX} -eq 0 ] ; then
+  echo "ERROR: No C++ compiler found: aborting..." > /dev/stderr
+  exit 1
+fi
+if [ "`basename ${MPI_F90}`" != "${MPI_F90}" ] ; then
+  echo "ERROR: Fortran compiler has to be the basename: ${MPI_F90}" > /dev/stderr
+  echo "ERROR: Invalid Fortran compiler: aborting..." > /dev/stderr
+  exit 1
+fi
+if [ "`basename ${MPI_CC}`" != "${MPI_CC}" ] ; then
+  echo "ERROR: C compiler has to be the basename: ${MPI_CC}" > /dev/stderr
+  echo "ERROR: Invalid C compiler: aborting..." > /dev/stderr
+  exit 1
+fi
+if [ "`basename ${MPI_CXX}`" != "${MPI_CXX}" ] ; then
+  echo "ERROR: C++ compiler has to be the basename: ${MPI_CXX}" > /dev/stderr
+  echo "ERROR: Invalid C++ compiler: aborting..." > /dev/stderr
+  exit 1
+fi
+if [ ${#MRCC_METHODS} -ne 0 ] ; then
+  if [[ ( ${NWCHEM_MODULES} != "all" ) &&
+        ( ${NWCHEM_MODULES} != "pnnl" ) &&
+        ( ${NWCHEM_MODULES} != "alldev" ) &&
+        ( ${NWCHEM_MODULES} != "pnnldev" ) &&
+        ( ${NWCHEM_MODULES} != "all python" ) &&
+        ( ${NWCHEM_MODULES} != "pnnl python" ) &&
+        ( ${NWCHEM_MODULES} != "alldev python" ) &&
+        ( ${NWCHEM_MODULES} != "pnnldev python" ) ]] ; then
+    echo "ERROR: The MRCC methods cannot be used with the NWCHEM_MODULES selection: ${NWCHEM_MODULES}" > /dev/stderr
+    echo "ERROR: Conflicting MRCC and NWCHEM_MODULES selection: aborting..." > /dev/stderr
+    exit 1
+  fi
+fi
+
+if [ "x$option" = "xrealclean" ]; then
+  rm -f nwchem_make_env.* nwchem_make_unenv.*
+fi
+
+if [ ${#OLD_GA} -ne 0 ] ; then
+  cd contrib/mapointer_test
+  ./fix_include_files
+  cd ../..
+fi
+cd $NWCHEM_TOP/src
+echo "=== configure GA ==="
+if [ ${#OLD_GA} -eq 0 ] ; then
+  if [ "x${option}" != "xrealclean" ]; then
+    make DIAG=PAR FC=$MPI_F90 CC=$MPI_CC CXX=$MPI_CXX LDOPTIONS="$LDOPTIONS" configure_ga
+    #
+    # Extract information about BLAS libraries from the GA config.status file
+    #
+    have_blas_false=`get_config_value "HAVE_BLAS_FALSE"`
+    have_blas_true=`get_config_value "HAVE_BLAS_TRUE"`
+    if [ "x${have_blas_true}" == "x" ] ; then
+      if [ "x${have_blas_false}" == "x#" ] ; then
+        # The GA found some BLAS library, set GA_BLAS accordingly
+        GA_BLAS=`get_config_value "BLAS_LDFLAGS"`
+        GA_BLAS="${GA_BLAS} `get_config_value \"BLAS_LIBS\"`"
+        GA_BLAS_SIZE=`get_config_value "BLAS_SIZE"`
+        export GA_BLAS
+        if [ ${#BLAS_SIZE} -ne 0 ] ; then
+          if [ "${BLAS_SIZE}" != "${GA_BLAS_SIZE}" ] ; then
+            echo "Warning: BLAS_SIZE and GA_BLAS_SIZE do not match " ${BLAS_SIZE} ${GA_BLAS_SIZE}
+            export GA_BLAS_SIZE=${BLAS_SIZE}
+          fi
+        fi
+        if [ "x${GA_BLAS_SIZE}" == "x4" ] ; then
+          export USE_64TO32=y
+        else
+          unset USE_64TO32
+        fi
+        echo "Found BLAS " ${GA_BLAS}
+        echo "Found BLAS type: integer*"${GA_BLAS_SIZE}
+      else
+        # Confused
+        echo "ERROR: A: inconsistent data on presence of BLAS library"
+        echo "have_blas_true  = " ${have_blas_true}
+        echo "have_blas_false = " ${have_blas_false}
+        exit 1
+      fi
+    elif [ "x${have_blas_true}" == "x#" ] ; then
+      if [ "x${have_blas_false}" == "x" ] ; then
+        # The GA found no BLAS library, unset GA_BLAS to maintain consistency
+        unset GA_BLAS
+        echo "Found no BLAS "
+      else
+        # Confused
+        echo "ERROR: B: inconsistent data on presence of BLAS library"
+        echo "have_blas_true  = " ${have_blas_true}
+        echo "have_blas_false = " ${have_blas_false}
+        exit 1
+      fi
+    else
+      echo "ERROR: C: invalid settings" 
+      echo "have_blas_true  = " ${have_blas_true}
+      echo "have_blas_false = " ${have_blas_false}
+      exit 1
+    fi
+    #
+    # Extract information about LAPACK libraries from the GA config.status file
+    #
+    have_lapack_false=`get_config_value "HAVE_LAPACK_FALSE"`
+    have_lapack_true=`get_config_value "HAVE_LAPACK_TRUE"`
+    if [ "x${have_lapack_true}" == "x" ] ; then
+      if [ "x${have_lapack_false}" == "x#" ] ; then
+        # The GA found some LAPACK library, set GA_LAPACK accordingly
+        GA_LAPACK=`get_config_value "LAPACK_LDFLAGS"`
+        GA_LAPACK="${GA_LAPACK} `get_config_value \"LAPACK_LIBS\"`"
+        GA_LAPACK_SIZE=`get_config_value "LAPACK_SIZE"`
+        export GA_LAPACK
+        if [ ${#LAPACK_SIZE} -ne 0 ] ; then
+          if [ "${LAPACK_SIZE}" != "${GA_LAPACK_SIZE}" ] ; then
+            echo "Warning: LAPACK_SIZE and GA_LAPACK_SIZE do not match " ${LAPACK_SIZE} ${GA_LAPACK_SIZE}
+            export GA_LAPACK_SIZE=${LAPACK_SIZE}
+          fi
+        fi
+        if [ "x${GA_LAPACK_SIZE}" == "x4" ] ; then
+          export USE_64TO32=y
+        else
+          unset USE_64TO32
+        fi
+        echo "Found LAPACK " ${GA_LAPACK}
+        echo "Found LAPACK type: integer*"${GA_LAPACK_SIZE}
+      else
+        # Confused
+        echo "ERROR: A: inconsistent data on presence of LAPACK library"
+        echo "have_lapack_true  = " ${have_lapack_true}
+        echo "have_lapack_false = " ${have_lapack_false}
+        exit 1
+      fi
+    elif [ "x${have_lapack_true}" == "x#" ] ; then
+      if [ "x${have_lapack_false}" == "x" ] ; then
+        # The GA found no LAPACK library, unset GA_LAPACK to maintain consistency
+        unset GA_LAPACK
+        echo "Found no LAPACK "
+      else
+        # Confused
+        echo "ERROR: B: inconsistent data on presence of LAPACK library"
+        echo "have_lapack_true  = " ${have_lapack_true}
+        echo "have_lapack_false = " ${have_lapack_false}
+        exit 1
+      fi
+    else
+      echo "ERROR: C: invalid settings" 
+      echo "have_lapack_true  = " ${have_lapack_true}
+      echo "have_lapack_false = " ${have_lapack_false}
+      exit 1
+    fi
+    #
+    # Extract information about SCALAPACK libraries from the GA config.status file
+    #
+    have_scalapack_false=`get_config_value "HAVE_SCALAPACK_FALSE"`
+    have_scalapack_true=`get_config_value "HAVE_SCALAPACK_TRUE"`
+    if [ "x${have_scalapack_true}" == "x" ] ; then
+      if [ "x${have_scalapack_false}" == "x#" ] ; then
+        # The GA found some SCALAPACK library, set GA_SCALAPACK accordingly
+        GA_SCALAPACK=`get_config_value "SCALAPACK_LDFLAGS"`
+        GA_SCALAPACK="${GA_SCALAPACK} `get_config_value \"SCALAPACK_LIBS\"`"
+        GA_SCALAPACK_SIZE=`get_config_value "SCALAPACK_SIZE"`
+        export GA_SCALAPACK
+        if [ ${#SCALAPACK_SIZE} -ne 0 ] ; then
+          if [ "${SCALAPACK_SIZE}" != "${GA_SCALAPACK_SIZE}" ] ; then
+            echo "Warning: SCALAPACK_SIZE and GA_SCALAPACK_SIZE do not match " ${SCALAPACK_SIZE} ${GA_SCALAPACK_SIZE}
+            export GA_SCALAPACK_SIZE=${SCALAPACK_SIZE}
+          fi
+        fi
+        if [ "x${GA_SCALAPACK_SIZE}" == "x4" ] ; then
+          export USE_64TO32=y
+        else
+          unset USE_64TO32
+        fi
+        echo "Found SCALAPACK " ${GA_SCALAPACK}
+        echo "Found SCALAPACK type: integer*"${GA_SCALAPACK_SIZE}
+      else
+        # Confused
+        echo "ERROR: A: inconsistent data on presence of SCALAPACK library"
+        echo "have_scalapack_true  = " ${have_scalapack_true}
+        echo "have_scalapack_false = " ${have_scalapack_false}
+        exit 1
+      fi
+    elif [ "x${have_scalapack_true}" == "x#" ] ; then
+      if [ "x${have_scalapack_false}" == "x" ] ; then
+        # The GA found no SCALAPACK library, unset GA_SCALAPACK to maintain consistency
+        unset GA_SCALAPACK
+        echo "Found no SCALAPACK "
+      else
+        # Confused
+        echo "ERROR: B: inconsistent data on presence of SCALAPACK library"
+        echo "have_scalapack_true  = " ${have_scalapack_true}
+        echo "have_scalapack_false = " ${have_scalapack_false}
+        exit 1
+      fi
+    else
+      echo "ERROR: C: invalid settings" 
+      echo "have_scalapack_true  = " ${have_scalapack_true}
+      echo "have_scalapack_false = " ${have_scalapack_false}
+      exit 1
+    fi
+  fi
+  if [ ${#BLASOPT} -eq 0 ] ; then
+    if [ ${#GA_SCALAPACK} -ne 0 ] ; then
+      export BLASOPT="${GA_SCALAPACK}"
+    fi
+    if [ ${#GA_LAPACK} -ne 0 ] ; then
+      export BLASOPT="${BLASOPT} ${GA_LAPACK}"
+    fi
+    if [ ${#GA_BLAS} -ne 0 ] ; then
+      export BLASOPT="${BLASOPT} ${GA_BLAS}"
+    fi
+    echo "BLASOPT from GA = " ${BLASOPT}
+  fi
+fi
+#
+# Mess around with Tau
+#
+# 1. Find the absolute pathnames of the F90, C, and C++ compilers and set
+#    TAU_F90_ABSOLUTE, TAU_CC_ABSOLUTE, and TAU_CXX_ABSOLUTE accordingly.
+# 2. Create soft-links in the bin-directory pointing the compilers to the
+#    corresponding nwc_tau_*.sh wrapper scripts.
+# 3. Prepend the bin directory to the PATH so the basename of the compiler
+#    points to the corresponding compiler wrapper script.
+# 4. USE_TAU should be set to
+#    a. "source" for source code instrumentation
+#    b. "compiler" for compiler based instrumentation
+#    c. remain unset for no instrumentation.
+#
+if [ ${#USE_TAU} -ne 0 ] ; then
+  echo "Doing Tau..."
+  export TAU_F90_ABSOLUTE=`which ${MPI_F90}`
+  export TAU_CC_ABSOLUTE=`which ${MPI_CC}`
+  export TAU_CXX_ABSOLUTE=`which ${MPI_CXX}`
+  cd ${NWCHEM_TOP}/bin
+  ln -s nwc_tau_f90.sh  ${MPI_F90}
+  ln -s nwc_tau_cc.sh   ${MPI_CC}
+  ln -s nwc_tau_cxx.sh  ${MPI_CXX}
+  ls
+  cd ${NWCHEM_TOP}
+  export CWD=`pwd`
+  export PATH=${CWD}/bin:${PATH}
+  export TAU_OPTIONS="-optRevert"
+  #
+  echo "export USE_TAU=${USE_TAU}"   >> ${NWCHEM_ENV_SH}
+  echo "export TAU_F90_ABSOLUTE=${TAU_F90_ABSOLUTE}"   >> ${NWCHEM_ENV_SH}
+  echo "export TAU_CXX_ABSOLUTE=${TAU_CXX_ABSOLUTE}"   >> ${NWCHEM_ENV_SH}
+  echo "export TAU_CC_ABSOLUTE=${TAU_CC_ABSOLUTE}"   >> ${NWCHEM_ENV_SH}
+  echo "export TAU_OPTIONS=${TAU_OPTIONS}"   >> ${NWCHEM_ENV_SH}
+  echo "export PATH=${PATH}"   >> ${NWCHEM_ENV_SH}
+  cd $NWCHEM_TOP/src
+fi
+#
+# End messing with Tau
+#
+#
+# Deal with USE_64TO32 which is special because it also depends on how the
+# GA configuration process went
+#
+if [ ${#USE_64TO32} -ne 0 ] ; then
+  echo "USE_64TO32         =" ${USE_64TO32}
+  echo "export USE_64TO32=${USE_64TO32}"   >> ${NWCHEM_ENV_SH}
+  echo "setenv USE_64TO32 ${USE_64TO32}"   >> ${NWCHEM_ENV_CSH}
+  echo "unset USE_64TO32"                  >> ${NWCHEM_UNENV_SH}
+  echo "unsetenv USE_64TO32"               >> ${NWCHEM_UNENV_CSH}
+fi
+echo "=== before    NWChem ==="
+echo "BLASOPT =" ${BLASOPT}
+echo "=== configure NWChem ==="
+if [ "x${option}" != "xrealclean" ]; then
+  make DIAG=PAR FC=$MPI_F90 CC=$MPI_CC CXX=$MPI_CXX LDOPTIONS="$LDOPTIONS" nwchem_config
+fi
+cd $NWCHEM_TOP/src/util
+echo "=== build NWChem version table ==="
+if [ "x${option}" != "xrealclean" ]; then
+  if [ ${#NWCHEM_VERSION} -ne 0 ] ; then
+    make DIAG=PAR FC=$MPI_F90 CC=$MPI_CC CXX=$MPI_CXX LDOPTIONS="$LDOPTIONS" version
+  else
+    rm -f util_version.F
+  fi
+fi
+cd $NWCHEM_TOP/src
+echo "=== do NWChem code conversion ==="
+if [ "x${option}" != "xrealclean" ]; then
+  #
+  # For some reason a Fortran compiler must be specified (even though none is
+  # used in the code conversion) otherwise an error message is generated and
+  # corresponding make operation fails.
+  #
+  make FC=$MPI_F90 directories
+  if [ ${#USE_64TO32} -eq 0 ] ; then
+     make FC=$MPI_F90 32_to_64
+  else
+     make FC=$MPI_F90 64_to_32
+  fi
+  #
+  # The make 32_to_64 or 64_to_32 forced the dependencies to be created
+  # However, at this time the Global Arrays have not been built yet and
+  # therefore the nwchem/src/tools/install/include directory does not exist,
+  # and hence the GA include files cannot be successfully located. As a result
+  # all the dependencies involving GA include files are bogus and wrong.
+  # So delete the time stamps that protect these dependencies so that new
+  # dependencies can be recorded at the right moment in the following make.
+  #
+  if [[ ! ( -d $NWCHEM_TOP/src/tools/install/include || \
+            -d $NWCHEM_TOP/src/tools/include ) ]] ; then
+    find . -name include_stamp -exec rm -f {} \; -print
+    find . -name dependencies -exec rm -f {} \; -print
+  fi
+fi
+echo "=== compile nwchem ==="
+make DIAG=PAR FC=$MPI_F90 CC=$MPI_CC CXX=$MPI_CXX  LDOPTIONS="$LDOPTIONS" $option
+cd $NWCHEM_TOP/contrib/mov2asc
+make DIAG=PAR FC=$MPI_F90 CC=$MPI_CC CXX=$MPI_CXX LDOPTIONS="$LDOPTIONS" $option
+echo "=== all done ==="

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" href="data:,">
+    <script src="/static/lib/d3.v4.min.js"></script>
+    <script src="/static/lib/jquery-3.3.1.min.js"></script>
+    <script src="/static/lib/tether.js"></script>
+    <script src="/static/lib/bootstrap.min.js"></script>
+    <script src="/static/lib/bootstrap-toggle.min.js"></script>
+    <script src="/static/lib/d3-scale-chromatic.v1.min.js"></script>    
+    <script type=text/javascript src="/static/lib/EventSource.js"></script>
+
+    <link rel="stylesheet" href="/static/lib/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="/static/js/styles.css">
+    <link rel="stylesheet" href="/static/lib/bootstrap-toggle.min.css">
+
+    <title>CODAR</title>
+</head>
+
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-6 well nopadding" id = "leftpanel">
+                &nbsp; &nbsp; <b class="title">Projection of Function Executions</b><br/> 
+                &nbsp; &nbsp; x axis:
+                <select id="sbox_x">
+                    <option value="0" selected>Entry</option>
+                    <option value="1">Execution Time</option>
+                    <option value="2">Rank#.Thread#</option>
+                    <option value="3">Exit</option>
+                </select>
+                &nbsp; y axis:
+                <select id="sbox_y">
+                    <option value="0">Entry</option>
+                    <option value="1" selected>Execution Time</option>
+                    <option value="2">Rank#.Thread#</option>
+                    <option value="3">Exit</option>
+                </select>
+                <div class="srate_container">
+                    &nbsp; &nbsp; Sampling rate: 
+                    <input type="range" min="0.001" max="1" value="1" step="0.001" class="sampling-rate-slider" id="srate">
+                    <span id="srate_val">1</span>
+                </div>
+                <button id="apply" type="button"> apply </button>
+                &nbsp; &nbsp; <input type="checkbox" id="scatter-cbox"> anomaly
+                &nbsp; &nbsp; <input type="checkbox" id="scatter-legend-filter"> filter all
+                <div class="nopadding" style="width: 900px;">
+                    <svg id="overview" class="scatterplot"></svg>
+                    <div id="scatter-legend" class="scatter-legend nopadding" style=" width: 300px; height: 600px; overflow-y:auto;"></div>
+                </div>
+            </div>
+            <div class="col-lg-6 well" id = "rightpanel">
+                <div class="row well nopadding">
+                    &nbsp; &nbsp; <b class="title">Selected Call Stack Tree</b>
+                    <svg id="treeview" style = "width: 745;"></svg>
+                </div>
+                <div class="row well nopadding" style="overflow-x: none;">
+                    &nbsp; &nbsp; <b class="title">Timeline and Message Visualization</b>
+                    <svg id="temporalview" style = "width: 745;"></svg>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="/static/js/constant.js"></script>
+    <script src="/static/js/view.js"></script>
+    <script src="/static/js/scatterview.js"></script>
+    <script src="/static/js/graphview.js"></script>
+    <script src="/static/js/dynamicgraphview.js"></script>
+    <script src="/static/js/temporalview.js"></script>
+    <script src="/static/js/visualizations.js"></script>
+    <script src="/static/js/data.js"></script>
+    <script>
+        var data = new Data(this);
+    </script>
+</body>
+
+</html>
