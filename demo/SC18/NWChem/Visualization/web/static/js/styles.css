@@ -1,0 +1,108 @@
+svg{
+    margin-right: 6px;
+}
+
+.margin{
+    margin-left: 10px;
+    margin-right: 10px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+.candidateMargin{
+    margin-left: 1px;
+    margin-top: 4px;
+    margin-bottom: 3px;
+}
+svg.selected{
+    border: 1px solid yellow
+}
+
+circle.selected {
+	stroke: #ffff00;
+  stroke-width: 1.5px;
+}
+
+rect.selected {
+  stroke: #ffff00;
+  stroke-width: 1.5px;
+}
+
+text {
+	font-family: sans-serif;
+	font-size: 12px;
+}
+
+.well {
+	border-style: solid;
+  border-width: 0.5px;
+  border-color: #333;
+  line-height: normal;
+}
+.smallfont{
+  font-size: 12px;
+} 
+.btn{
+  font-size: 12px;
+  padding-left:4px;
+  padding-right:4px;
+  padding-top:4px;
+  padding-bottom:4px;
+}
+.nopadding{
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+.toggle-off {
+    box-shadow: inset 0 3px 5px rgba(0, 0, 0, .125);
+}
+.toggle.off {
+    border-color: rgba(0, 0, 0, .25);
+}
+.toggle-handle {
+    background-color: white;
+    border: thin rgba(0, 0, 0, .25) solid;
+}
+        
+.title {
+    font-size: 20px;
+}
+.label {
+    font-weight: bold;
+}
+.scatter-legend {
+    display: inline-block; 
+    vertical-align: top; 
+    width: 185px;
+}
+.scatter-legend-item {
+    display: table;
+    margin-bottom: 5px;
+    cursor: pointer;
+}
+.scatter-legend-item-circle {
+    border-radius: 50%;
+    behavior: url(PIE.htc);
+    width: 20px;
+    height: 20px !important;
+    display: inline-block;
+    vertical-align: middle;
+}
+.scatter-legend-item-text {
+    height: 20px;
+    display: table-cell;
+    vertical-align: middle;
+    padding-left: 5px;
+}
+.scatterplot {
+    display: inline-block;  
+    width: 550px; 
+    height: 550px;
+}
+.srate_container {
+    display: inline;
+}
+.sampling-rate-slider {
+    width: 100px;
+}
+
