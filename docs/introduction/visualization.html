@@ -93,6 +93,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#online-analysis-visualization">Online Analysis Visualization</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="#furthermore">Furthermore</a></li>
 </ul>
 </li>
 </ul>
@@ -173,8 +174,8 @@
 <h1>Visualization (Viz) module<a class="headerlink" href="#visualization-viz-module" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="backend-server">
 <h2>Backend Server<a class="headerlink" href="#backend-server" title="Permalink to this headline">¶</a></h2>
-<div class="figure align-default" id="id1">
-<img alt="Visualization server" src="../_images/vizserver.png" />
+<div class="figure align-center" id="id1">
+<a class="reference internal image-reference" href="../_images/vizserver.png"><img alt="Visualization server" src="../_images/vizserver.png" style="width: 492.8px; height: 235.20000000000002px;" /></a>
 <p class="caption"><span class="caption-text">The architecture for visualization backend server
 including uWSGI workers serving concurrent connections,
 celery workers and a Redis message queue for asynchronous tasks
@@ -203,7 +204,7 @@ in the visualization domain.</p>
 <div class="section" id="in-situ-visualization">
 <h3>In-Situ Visualization<a class="headerlink" href="#in-situ-visualization" title="Permalink to this headline">¶</a></h3>
 <div class="figure align-center" id="id2">
-<a class="reference internal image-reference" href="../_images/anomaly_stat_view.png"><img alt="in-situ ranking dashboard" src="../_images/anomaly_stat_view.png" style="width: 250.0px; height: 154.0px;" /></a>
+<a class="reference internal image-reference" href="../_images/anomaly_stat_view.png"><img alt="in-situ ranking dashboard" src="../_images/anomaly_stat_view.png" style="width: 350.0px; height: 215.6px;" /></a>
 <p class="caption"><span class="caption-text">Dynamic <strong>ranking dashboard</strong> as rank-level visualization granularity
 for the most and the least problematic MPI processes.</span><a class="headerlink" href="#id2" title="Permalink to this image">¶</a></p>
 </div>
@@ -257,6 +258,10 @@ a horizontal bar in the call stack will pop up detailed information regarding th
 function. A communication (message receiving or sending) is encoded by an arrow between a function
 and a horizontal line representing another rank ID.</p>
 </div>
+</div>
+<div class="section" id="furthermore">
+<h2>Furthermore<a class="headerlink" href="#furthermore" title="Permalink to this headline">¶</a></h2>
+<p>More details can be found in <a class="reference external" href="https://github.com/CODARcode/ChimbukoVisualizationII">visualization repository</a>.</p>
 </div>
 </div>
 

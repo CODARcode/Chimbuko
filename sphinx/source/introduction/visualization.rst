@@ -6,6 +6,8 @@ Backend Server
 --------------
 
 .. figure:: img/vizserver.png
+   :scale: 20 %
+   :align: center
    :alt: Visualization server
 
    The architecture for visualization backend server 
@@ -40,7 +42,7 @@ In-Situ Visualization
 ~~~~~~~~~~~~~~~~~~~~~
 
 .. figure:: img/anomaly_stat_view.png
-   :scale: 50 %
+   :scale: 70 %
    :align: center
    :alt: in-situ ranking dashboard
 
@@ -109,3 +111,8 @@ of the name of each function with black being normal and red being abnormal. Hov
 a horizontal bar in the call stack will pop up detailed information regarding the corresponding 
 function. A communication (message receiving or sending) is encoded by an arrow between a function 
 and a horizontal line representing another rank ID. 
+
+Furthermore
+-----------
+
+More details can be found in `visualization repository <https://github.com/CODARcode/ChimbukoVisualizationII>`_.

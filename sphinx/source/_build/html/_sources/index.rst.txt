@@ -8,6 +8,11 @@ Chimbuko: A Workflow-Level Scalable Performance Trace Analysis Tool
 
 Funded by the `Exascale Computing Project (ECP) <https://www.exascaleproject.org/>`_, U.S. Department of Energy
 
+Chimbuko repositories:
+
+- `Anomaly Detection (AD) module <https://github.com/CODARcode/PerformanceAnalysis>`_
+- `Visualization (Viz) module <https://github.com/CODARcode/ChimbukoVisualizationII>`_ 
+
 .. toctree::
    :caption: Inroduction
 
