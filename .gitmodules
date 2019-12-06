@@ -6,3 +6,6 @@
 	url = https://github.com/CODARcode/PerformanceVisualization.git
 [submodule "demo/SC18/NWChem/submod/Analysis"]
 	path = demo/SC18/NWChem/submod/Analysis
+[submodule "ChimbukoVisualizationII"]
+	path = ChimbukoVisualizationII
+	url = https://github.com/CODARcode/ChimbukoVisualizationII
