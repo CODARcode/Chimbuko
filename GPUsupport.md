@@ -3,20 +3,22 @@
 In order to interface with CUDA runtime profiling, the binary needs to be run under tau_exec (in addition to compiler profiling for the host functions). 
 
 We run tau_exec with the following options
-> -env -um -cupti -io -memory
+> -env -um -cupti
 
 ____
-With -cupti -um options:
+## How Tau provides information to Chimbuko
 
-CUPTI is CUDA's performance tracking API, and it is with this that TAU interfaces. -cupti enables this.
-The option -um is designed to track unified memory transfers but is not currently working (open issue, devs aware).
+Tau provides 3 types of information on its ADIOS2 output stream or as a BPFile dump:
+1. Timers: These are timestamps associated with function and communication events.
+2. Counters: These are general numerical information that can be associated with functions, comms or other other environment variables that Tau monitors
+3. Metadata: These are simple key/value pairs describing the system, the timers and counters
 
-Function entry and exit as well as comms events are placed in the SST stream in the form of an 'event_timestamps' array made up of blocks of 6 integers which correspond to the following event properties:
+Chimbuko captures all of these data, but we are primarily concerned with function entry/exit events, from which it computes timing statistics and ultimately anomalies. Each function has an associated timer index, and timer data are passed in the form of an 'event_timestamps' array made up of blocks of 6 integers which correspond to the following event properties:
 0. Program index (typically 0)
 1. MPI rank
 2. Thread index
 3. Event index which maps as follows:  0:ENTRY 1:EXIT 2:SEND 3:RECV
-4. Function index
+4. Timer index (which maps to a function name as above)
 5. Timestamp
 
 The mapping of function index to a particular function are passed as metadata attributes with a name of the form "timer $id" where $id is the index, and a value corresponding to the function name.
@@ -28,36 +30,35 @@ apart from
 > timer 0 -> ".TAU application"
 
 
-When instrumenting a GPU application new function mappings appear:
-* cudaLaunchKernel
-* cudaEventCreate
-* cudaEventSynchronize
-* cudaDeviceSynchronize
-* cudaMallocManaged
-* cudaFree
+____
+## How Tau deals with GPUs
 
-These are CUDA API calls.
+In general, a node can have multiple GPUs and multiple "streams" per GPU, the latter being the mechanism by which kernels can be overlapped on a GPU.
 
-* Event Synchronize
-* Context Synchronize
+Tau obtains information about NVidia GPU executions using CUPTI; CUDA's performance tracking API.
 
-The meaning of these has yet to be determined.
+In a similar way to which Tau passes information to Chimbuko, the CUPTI API passes events and counters to Tau. Tau considers each device/stream as a virtual "thread" to which events/counters are associated, much like a CPU core. Tau forwards the CUPTI events and counters to Chimbuko in an identical way to which it passes CPU events, only the "thread" to which an event/counter is associated is the virtual thread index.
 
-We also get regular function-like mappings that are likely related to the CUDA compiled GPU code, eg (for function add(int, float\*, float\*))
+In principle CUPTI can generate very detailed information about the running of a particular kernel, but at the cost of orders-of-magnitude slowdown in the execution. As we are interested in full system, at-scale running with minimal footprint, we are unable to utilize this aspect of CUPTI. Instead what Tau receives from CUPTI are a number of statistics about the kernel execution (GPU occupancy, memory usage, etc) and events corresponding to when a kernel started and finished executing.
+
+NOTE: This means we do *not* have thread-level granularity on GPU kernel execution. The volume of information associated with a GPU device/stream is the same as if we had executed the kernels on a single CPU core. As a result, the much-feared explosion of information associated with GPU running is not an issue.
 
 
-> timer 10 -> "__device_stub__Z3addiPfS_(int, float\*, float\*) [{/tmp/tmpxft_00000018_00000000-5_instr_main.cudafe1.stub.c} {13,0}]"
+____
+## Description of options an available data
 
-and a regular function which likely is associated with the host function wrapper code:
+### -cupti
 
-> timer 9 -> "add(int, float\*, float\*) [{/mnt/sst_view/instr_main.C} {12,0}]"
+This option enables CUPTI, allowing for the capturing of cuda API calls and kernel calls as well as other counter data.
 
-With these information we can expect to be able to:
-* Time kernel execution
-* Associate kernel executions with GPU "environment variables" such as GPU temperature
+Of primary interest are the mappings of virtual thread index to device. These are obtained from metadata entries of the following form:
+> MetaData:0:9:CUDA Context {Elements:1 Type:string Value:"1" }
 
+> MetaData:0:9:CUDA Device {Elements:1 Type:string Value:"0" }
 
-Tau recently added additional metadata enabled with the -cupti option, which provide information about each GPU. For example, on our 3-GPU NVidia Quadro machine,
+MetaData entries always start with "MetaData:\<process\>:\<thread\>:". Here we see that virtual thread 9 is associated with CUDA context #1 , device #0. Presumably stream information will be likewise provided if multiple streams are used.
+
+We also obtain metadata describing the GPUs, of the form:
 
 > MetaData:0:0:GPU[0] Clock Rate {Elements:1 Type:string Value:"1627000" }
 
@@ -87,39 +88,67 @@ Tau recently added additional metadata enabled with the -cupti option, which pro
 
 > MetaData:0:0:GPU[0] Warp Size {Elements:1 Type:string Value:"32" }
 
-(repeat for each of the other two devices)
+from which we can deduce the properties of our device #0, a Quadro GV100.
 
-____
-With -env option of tau_exec, the following additional data are captured and output each step as "counters"
-* Power Utilization (% mW)
-* SM Frequency (MHz)
+Kernel executions appear associated with the specific virtual thread (9 here). The functions likewise appear as timers, e.g.
+
+> timer 18 {Elements:1 Type:string Value:"the_kernel(long long)" }
+
+And here is an example (exit0 event for timer 18, thread 9:
+
+> (92 0 ):0 (92 1 ):0 (92 2 ):9 (92 3 ):1 (92 4 ):18 (92 5 ):1588718808525217
+
+We also obtain timers associated with various CUDA API calls, e.g.
+
+* cudaLaunchKernel
+* cudaEventCreate
+* cudaEventSynchronize
+* cudaDeviceSynchronize
+* cudaMallocManaged
+* cudaFree
+* Event Synchronize
+* Context Synchronize
+
+Finally we receive a number of counters associated with the following:
+
+* Allocatable Blocks Per SM given Registers used (Blocks)
+* Allocatable Blocks Per SM given Shared Memory usage (Blocks)
 * GPU Occupancy (Warps)
 * Block Size
 * Shared Dynamic Memory (bytes)
 * Shared Static Memory (bytes)
-* Memory Frequency (MHz)
-* GPU Temperature (C)
-* Fan Speed (% max)
 * Local Memory (bytes per thread)
 * Local Registers (per thread)
 * Allocatable Blocks per SM given Thread count (Blocks)
-* Allocatable Blocks Per SM given Registers used (Blocks)
-* Allocatable Blocks Per SM given Shared Memory usage (Blocks)
 
-These counters are captured each time step and appear to be updated at some regular frequency. This requires further investigation; it possibly occurs for each kernel execution.
+I believe these are associated with a given kernel.
 
-___
-With -memory we gain additional counters:
-* Heap Allocate
-* Heap Memory Used (KB)
+____
+### -um
+
+This option enables tracking of unified memory events.
+
+With this option we gain new counters:
+
+* Unified Memory Bytes copied from Device to Host
+* Unified Memory Bytes copied from Host to Device
+
+and new timers:
+
+* Unified Memory copy Host to Device
+* Unified Memory copy Device to Host
+
+
+____
+### -env
+
+This option enables collecting of some GPU "environment" variables as counters. These may be collected at a regular frequency and may not be tied to a particular kernel.
+* Power Utilization (% mW)
+* SM Frequency (MHz)
 * Memory Frequency (MHz)
-* Shared Dynamic Memory (bytes)
-* Shared Static Memory (bytes)
-* Local Memory (bytes per thread)
-* Heap Free
-* Decrease in Heap Memory (KB)
-* Heap Memory Used (KB) at Exit
-* Increase in Heap Memory (KB)
-* Heap Memory Used (KB) at Entry
+* GPU Temperature (C)
+* Fan Speed (% max)
 
-These don't appear to be associated with the GPU but we could track them for anomaly detection.
+
+
+
