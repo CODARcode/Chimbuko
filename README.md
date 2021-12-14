@@ -27,7 +27,7 @@ Detailed documentation on the API, installation and usage of the Chimbuko "Perfo
 
 ## Releases
 
-The current v4.5 release includes support for installation via Spack, a new script to simplify launching the Chimbuko services, a streaming implementation of the HBOS algorithm for improved anomaly detection, and various optimizations.
+The current v5.0 release includes support for installation via Spack, a new script to simplify launching the Chimbuko services, a streaming implementation of the HBOS algorithm for improved anomaly detection, and various optimizations.
 
 ### [Chimbuko Data Analysis](https://github.com/CODARcode/PerformanceAnalysis)
 
