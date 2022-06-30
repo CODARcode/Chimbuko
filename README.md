@@ -27,7 +27,14 @@ Detailed documentation on the API, installation and usage of the Chimbuko "Perfo
 
 ## Releases
 
-The current v5.0 release includes support for installation via Spack, a new script to simplify launching the Chimbuko services, a streaming implementation of the HBOS algorithm for improved anomaly detection, and various optimizations.
+The current v5.5 release includes:
+- Significant improvements to thread scalability of the parameter server
+- Major improvements to histogram creation and merging to improve the correctness of the AD model for HBOS and COPOD algorithms
+- Improvements to the implementation of the HBOS and COPOD algorithms based on extensive testing
+- Expanded function profile capture in the global provenance database to include runtime and anomaly statistics by function
+- Expanded options for controlling Chimbuko's functionality including the ability to skip anomaly detection for certain functions and changing the frequency the analysis is performed
+- Expanded functionality for interacting with the provenance database through Python scripts
+- Various fixes and optimizations
 
 ### [Chimbuko Data Analysis](https://github.com/CODARcode/PerformanceAnalysis)
 
