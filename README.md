@@ -27,13 +27,11 @@ Detailed documentation on the API, installation and usage of the Chimbuko "Perfo
 
 ## Releases
 
-The current v5.5 release includes:
-- Significant improvements to thread scalability of the parameter server
-- Major improvements to histogram creation and merging to improve the correctness of the AD model for HBOS and COPOD algorithms
-- Improvements to the implementation of the HBOS and COPOD algorithms based on extensive testing
-- Expanded function profile capture in the global provenance database to include runtime and anomaly statistics by function
-- Expanded options for controlling Chimbuko's functionality including the ability to skip anomaly detection for certain functions and changing the frequency the analysis is performed
-- Expanded functionality for interacting with the provenance database through Python scripts
+The current v6.0 release includes:
+- An overhaul of the visualization frontend workflow allowing for easier isolation of problematic ranks/functions
+- New offline analysis tools including summary generation for single runs and for between-run analysis
+- Significant enhancements to the utility of the provenance data including incorporating system state information from TAU's monitoring plugin
+- Improved workflow support
 - Various fixes and optimizations
 
 ### [Chimbuko Data Analysis](https://github.com/CODARcode/PerformanceAnalysis)
