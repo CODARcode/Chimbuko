@@ -42,7 +42,7 @@ This library provides C/C++ APIs to process [TAU](http://tau.uoregon.edu) perfor
 
 This is a visualization framework for online performance analysis. This framework mainly focuses on visualizing real-time anomalous behaviors in a High Performance Computing application so that any patterns of anomalies that users might not have recognized can be effectively detected through online visual analytics.
 
-### Citations
+## Citations
 
 For citing Chimbuko, please use:
 
