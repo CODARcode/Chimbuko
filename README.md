@@ -43,3 +43,8 @@ This library provides C/C++ APIs to process [TAU](http://tau.uoregon.edu) perfor
 
 This is a visualization framework for online performance analysis. This framework mainly focuses on visualizing real-time anomalous behaviors in a High Performance Computing application so that any patterns of anomalies that users might not have recognized can be effectively detected through online visual analytics.
 
+## Citations
+
+For citing Chimbuko, please use:
+
+C. Kelly et al., “Chimbuko: A Workflow-Level Scalable Performance Trace Analysis Tool,” in ICPS Proceedings, in ISAV’20. online: Association for Computing Machinery, Nov. 2020, pp. 15–19. doi: 10.1145/3426462.3426465.
