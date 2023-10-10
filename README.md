@@ -27,12 +27,13 @@ Detailed documentation on the API, installation and usage of the Chimbuko "Perfo
 
 ## Releases
 
-The current v6.0 release includes:
-- An overhaul of the visualization frontend workflow allowing for easier isolation of problematic ranks/functions
-- New offline analysis tools including summary generation for single runs and for between-run analysis
-- Significant enhancements to the utility of the provenance data including incorporating system state information from TAU's monitoring plugin
-- Improved workflow support
-- Various fixes and optimizations
+The current v6.5 release includes:
+- Offline analysis command-line tooling that now supports interactive parsing and summarizing of global provenance data
+- Support for the Cray CXI provider used by HPE Slingshot 11 networks such as Frontier
+- Improved ease-of-use for using the Infiniband verbs provider
+- Significant performance optimizations and robustness/veracity improvements to the HBOS algorithm implementation
+- Experimental support for launching Chimbuko's services and online anomaly detection components through a single script
+- Various fixes and code improvements
 
 ### [Chimbuko Data Analysis](https://github.com/CODARcode/PerformanceAnalysis)
 
