@@ -1,5 +1,5 @@
 # Chimbuko
-
+![Chimbuko](Chimbuko-logo.png)
 ## Introduction
 
 The Chimbuko framework captures, analyzes and visualizes performance metrics for complex scientific workflows and relates these metrics to the context of their execution (provenance) on extreme-scale
