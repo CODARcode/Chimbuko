@@ -27,13 +27,23 @@ Detailed documentation on the API, installation and usage of the Chimbuko "Perfo
 
 ## Releases
 
-The current v6.5 release includes:
-- Offline analysis command-line tooling that now supports interactive parsing and summarizing of global provenance data
-- Support for the Cray CXI provider used by HPE Slingshot 11 networks such as Frontier
-- Improved ease-of-use for using the Infiniband verbs provider
-- Significant performance optimizations and robustness/veracity improvements to the HBOS algorithm implementation
-- Experimental support for launching Chimbuko's services and online anomaly detection components through a single script
-- Various fixes and code improvements
+The current v7.0 release includes updates to the following components:
+
+#### Chimbuko backend
+- Added anomaly "post-pruning"; a second pass over recorded anomalies is performed at the end of the run, re-evaluating stored anomalies against the final AD model and discarding those no longer considered anomalous. This significantly reduces the number of mislabeled anomalies resulting from an unconverged AD model.
+- Major refactoring of backend codebase, separating out generic functionality and that specific to analyzing performance trace data. Additional modules can now be created to analyze other streaming data types.
+- Improvements to services including:
+    - Finer control over network interfaces used by service components
+ 	- Optional NUMA binding of service components
+	- Additional controls over the frequency of provenance database and pserver sends from the AD modules to reduce network load
+- Improvements to AD algorithm robustness for several edge cases
+- Various bugfixes
+#### Visualization
+- Updated dependencies for the visualization component
+#### Offline analysis
+- Added a new tool for converting Chimbuko's provenance database to a relational database
+- Added a preliminary version of a new Python library for offline analysis built around the relational database
+
 
 ### [Chimbuko Data Analysis](https://github.com/CODARcode/PerformanceAnalysis)
 
@@ -46,5 +56,7 @@ This is a visualization framework for online performance analysis. This framewor
 ## Citations
 
 For citing Chimbuko, please use:
+
+Kelly C., Xu W., Pouchard L.C., et al. "Performance analysis and data reduction for exascale scientific workflows". The International Journal of High Performance Computing Applications. 2025;39(4):553-578. doi: 10.1177/10943420251316253
 
 C. Kelly et al., “Chimbuko: A Workflow-Level Scalable Performance Trace Analysis Tool,” in ICPS Proceedings, in ISAV’20. online: Association for Computing Machinery, Nov. 2020, pp. 15–19. doi: 10.1145/3426462.3426465.

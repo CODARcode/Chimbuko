@@ -10,3 +10,9 @@
 [submodule "PerformanceAnalysis"]
 	path = PerformanceAnalysis
 	url = https://github.com/CODARcode/PerformanceAnalysis
+[submodule "ChimbukoProvDBconvert"]
+	path = ChimbukoProvDBconvert
+	url = https://github.com/CODARcode/ChimbukoProvDBconvert.git
+[submodule "ChimbukoOfflineAnalysis"]
+	path = ChimbukoOfflineAnalysis
+	url = https://github.com/CODARcode/ChimbukoOfflineAnalysis.git
